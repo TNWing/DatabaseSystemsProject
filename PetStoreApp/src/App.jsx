@@ -54,7 +54,7 @@ function App() {
                 </div>
             </div>
             <div className="carousel-item">
-              <svg className="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="var(--bs-secondary-color)"/></svg>
+              <img src="src/images/petImage2.jpeg" className="d-block w-100" alt="Slide 2"/>
               <div className="container">
                 <div className="carousel-caption">
                   <h1>Another example headline.</h1>
@@ -64,7 +64,7 @@ function App() {
               </div>
             </div>
             <div className="carousel-item">
-              <svg className="bd-placeholder-img" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="var(--bs-secondary-color)"/></svg>
+              <img src="src/images/petImage3.jpeg" className="d-block w-100" alt="Slide 3"/>
               <div className="container">
                 <div className="carousel-caption text-end">
                   <h1>One more for good measure.</h1>
