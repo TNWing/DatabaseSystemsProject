@@ -45,7 +45,7 @@ function App() {
           </div>
           <div className="carousel-inner">
             <div className="carousel-item active">
-              <img src="src/images/petImage1.jpg" className="d-block w-100" alt="Slide 1"/>
+              <img src="src/images/petImage3.jpeg" className="d-block w-100" alt="Slide 1"/>
               <div className="container">
                 <div className="carousel-caption text-start transparent-bg">
                   <h1>Bringing joy.</h1>
@@ -56,7 +56,7 @@ function App() {
             </div>
 
             <div className="carousel-item">
-              <img src="src/images/petImage2.jpeg" className="d-block w-100" alt="Slide 2"/>
+              <img src="src/images/petImage3.jpeg" className="d-block w-100" alt="Slide 2"/>
               <div className="container">
                 <div className="carousel-caption transparent-bg">
                   <h1>Finding family.</h1>
@@ -127,8 +127,8 @@ function App() {
           
           <div className="row featurette">
             <div className="col-md-7">
-              <h2 className="featurette-heading fw-normal lh-1">First featurette heading. <span className="text-body-secondary">It’ll blow your mind.</span></h2>
-              <p className="lead">Some great placeholder content for the first featurette here. Imagine some exciting prose here.</p>
+              <h2 className="featurette-heading fw-normal lh-1">Learn about your pet. <span className="text-body-secondary">It’ll blow your mind.</span></h2>
+              <p className="lead">Find out what your pet needs to eat in order to be the best version of itself.</p>
             </div>
             <div className="col-md-5">
               <svg className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-bg)"/><text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">500x500</text></svg>
@@ -139,8 +139,8 @@ function App() {
 
           <div className="row featurette">
             <div className="col-md-7 order-md-2">
-              <h2 className="featurette-heading fw-normal lh-1">Oh yeah, it’s that good. <span className="text-body-secondary">See for yourself.</span></h2>
-              <p className="lead">Another featurette? Of course. More placeholder content here to give you an idea of how this layout would work with some actual real-world content in place.</p>
+              <h2 className="featurette-heading fw-normal lh-1">We find the cutest pets. <span className="text-body-secondary">See for yourself.</span></h2>
+              <p className="lead">We have a wide variety of pets all with different personalities and characteristics. Every pet is unique in its own way. </p>
             </div>
             <div className="col-md-5 order-md-1">
               <svg className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-bg)"/><text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">500x500</text></svg>
@@ -151,8 +151,8 @@ function App() {
 
           <div className="row featurette">
             <div className="col-md-7">
-              <h2 className="featurette-heading fw-normal lh-1">And lastly, this one. <span className="text-body-secondary">Checkmate.</span></h2>
-              <p className="lead">And yes, this is the last block of representative placeholder content. Again, not really intended to be actually read, simply here to give you a better view of what this would look like with some actual content. Your content.</p>
+              <h2 className="featurette-heading fw-normal lh-1">Apply for adoption. <span className="text-body-secondary">Checkmate.</span></h2>
+              <p className="lead">Once you have fallen in love with one of our pets apply for adoption. Our dedicated team will start working extremely hard to ensure the process is smooth and transparent.</p>
             </div>
             <div className="col-md-5">
               <svg className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-bg)"/><text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">500x500</text></svg>
