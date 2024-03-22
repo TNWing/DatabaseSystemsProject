@@ -1,7 +1,8 @@
 import React from 'react';
+import "bootstrap/dist/css/bootstrap.min.css"
 import './App.css'
 import {Button, Navbar, Container, Nav, NavDropdown} from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css"
+
 
 function App() {
   return (
@@ -16,19 +17,19 @@ function App() {
             <div className="collapse navbar-collapse" id="navbarCollapse">
               <ul className="navbar-nav me-auto mb-2 mb-md-0">
                 <li className="nav-item">
-                  <a className="nav-link active" aria-current="page" href="#">ADOPT</a>
+                  <a className="nav-link active custom-link" aria-current="page" href="#">ADOPT</a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link active" aria-current="page" href="#">DONATE</a>
+                  <a className="nav-link active custom-link" aria-current="page" href="#">DONATE</a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link active" aria-current="page" href="#">VOLUNTEER</a>
+                  <a className="nav-link active custom-link" aria-current="page" href="#">VOLUNTEER</a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link active" aria-current="page" href="#">RESOURCES</a>
+                  <a className="nav-link active custom-link" aria-current="page" href="#">RESOURCES</a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link active">SIGN IN</a>
+                  <a className="nav-link active custom-link" aria-current="page" href="#">SIGN IN</a>
                 </li>
               </ul>
             </div>
@@ -47,9 +48,9 @@ function App() {
                 <img src="src/images/petImage1.jpg" className="d-block w-100" alt="Slide 1"/>
                 <div className="container">
                     <div className="carousel-caption text-start">
-                        <h1>Example headline.</h1>
-                        <p className="opacity-75">Some representative placeholder content for the first slide of the carousel.</p>
-                        <p><a className="btn btn-lg btn-primary" href="#">Sign up today</a></p>
+                        <h1>Bringing joy.</h1>
+                        <p className="opacity-75">Join us in our mission to bring joy into the lives of pets and people alike, one adoption at a time.</p>
+                        <p><a className="btn btn-lg btn-primary" href="#">Adopt</a></p>
                     </div>
                 </div>
             </div>
@@ -57,9 +58,9 @@ function App() {
               <img src="src/images/petImage2.jpeg" className="d-block w-100" alt="Slide 2"/>
               <div className="container">
                 <div className="carousel-caption">
-                  <h1>Another example headline.</h1>
-                  <p>Some representative placeholder content for the second slide of the carousel.</p>
-                  <p><a className="btn btn-lg btn-primary" href="#">Learn more</a></p>
+                  <h1>Finding family.</h1>
+                  <p>Together, we make tails wag as we unite pets with their forever families, spreading happiness and love.</p>
+                  <p><a className="btn btn-lg btn-primary" href="#">Donate</a></p>
                 </div>
               </div>
             </div>
@@ -67,9 +68,9 @@ function App() {
               <img src="src/images/petImage3.jpeg" className="d-block w-100" alt="Slide 3"/>
               <div className="container">
                 <div className="carousel-caption text-end">
-                  <h1>One more for good measure.</h1>
-                  <p>Some representative placeholder content for the third slide of this carousel.</p>
-                  <p><a className="btn btn-lg btn-primary" href="#">Browse gallery</a></p>
+                  <h1>Transforming lives.</h1>
+                  <p>From shelter to forever family, we're dedicated to guiding pets on their journey to finding lasting love and companionship.</p>
+                  <p><a className="btn btn-lg btn-primary" href="#">Resources</a></p>
                 </div>
               </div>
             </div>
@@ -83,6 +84,86 @@ function App() {
             <span className="visually-hidden">Next</span>
           </button>
         </div>
+
+        <div className="container marketing">
+          <h2 className="fw-normal">Meet the team</h2>
+          <div className="row">
+            <div className="col-lg-4">
+              <svg className="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
+                <title>Placeholder</title>
+                <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
+              </svg>
+              <h2 className="fw-normal">Dante Amicarella</h2>
+              <p>Dante's bio and role in the team.</p>
+              <p><a className="btn btn-secondary" href="#">View details &raquo;</a></p>
+            </div>
+            <div className="col-lg-4">
+              <svg className="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
+                <title>Placeholder</title>
+                <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
+              </svg>
+              <h2 className="fw-normal">Jessilyn Collette</h2>
+              <p>Jess's bio and role in the team.</p>
+              <p><a className="btn btn-secondary" href="#">View details &raquo;</a></p>
+            </div>
+            <div className="col-lg-4">
+              <svg className="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
+                <title>Placeholder</title>
+                <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
+              </svg>
+              <h2 className="fw-normal">Trevor Ng</h2>
+              <p>Trevor's bio and role in the team.</p>
+              <p><a className="btn btn-secondary" href="#">View details &raquo;</a></p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          {/* Start Featurettes */}
+          <hr className="featurette-divider" />
+          
+          <div className="row featurette">
+            <div className="col-md-7">
+              <h2 className="featurette-heading fw-normal lh-1">First featurette heading. <span className="text-body-secondary">It’ll blow your mind.</span></h2>
+              <p className="lead">Some great placeholder content for the first featurette here. Imagine some exciting prose here.</p>
+            </div>
+            <div className="col-md-5">
+              <svg className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-bg)"/><text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">500x500</text></svg>
+            </div>
+          </div>
+
+          <hr className="featurette-divider" />
+
+          <div className="row featurette">
+            <div className="col-md-7 order-md-2">
+              <h2 className="featurette-heading fw-normal lh-1">Oh yeah, it’s that good. <span className="text-body-secondary">See for yourself.</span></h2>
+              <p className="lead">Another featurette? Of course. More placeholder content here to give you an idea of how this layout would work with some actual real-world content in place.</p>
+            </div>
+            <div className="col-md-5 order-md-1">
+              <svg className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-bg)"/><text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">500x500</text></svg>
+            </div>
+          </div>
+
+          <hr className="featurette-divider" />
+
+          <div className="row featurette">
+            <div className="col-md-7">
+              <h2 className="featurette-heading fw-normal lh-1">And lastly, this one. <span className="text-body-secondary">Checkmate.</span></h2>
+              <p className="lead">And yes, this is the last block of representative placeholder content. Again, not really intended to be actually read, simply here to give you a better view of what this would look like with some actual content. Your content.</p>
+            </div>
+            <div className="col-md-5">
+              <svg className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 500x500" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="var(--bs-secondary-bg)"/><text x="50%" y="50%" fill="var(--bs-secondary-color)" dy=".3em">500x500</text></svg>
+            </div>
+          </div>
+
+          <hr className="featurette-divider" />
+          {/* End Featurettes */}
+        </div>
+        
+        <footer className="container">
+          <p className="float-end"><a href="#">Back to top</a></p>
+          <p>&copy; 2024 Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+        </footer>
       </main>
     </div>
   );
