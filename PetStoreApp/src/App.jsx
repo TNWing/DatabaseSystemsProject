@@ -1,5 +1,5 @@
 import React from 'react';
-import "bootstrap/dist/css/bootstrap.min.css"
+import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
 import './App.css'
 import {Button, Navbar, Container, Nav, NavDropdown} from "react-bootstrap";
 
@@ -45,19 +45,20 @@ function App() {
           </div>
           <div className="carousel-inner">
             <div className="carousel-item active">
-                <img src="src/images/petImage1.jpg" className="d-block w-100" alt="Slide 1"/>
-                <div className="container">
-                    <div className="carousel-caption text-start">
-                        <h1>Bringing joy.</h1>
-                        <p className="opacity-75">Join us in our mission to bring joy into the lives of pets and people alike, one adoption at a time.</p>
-                        <p><a className="btn btn-lg btn-primary" href="#">Adopt</a></p>
-                    </div>
+              <img src="src/images/petImage1.jpg" className="d-block w-100" alt="Slide 1"/>
+              <div className="container">
+                <div className="carousel-caption text-start transparent-bg">
+                  <h1>Bringing joy.</h1>
+                  <p className="opacity-75">Join us in our mission to bring joy into the lives of pets and people alike, one adoption at a time.</p>
+                  <p><a className="btn btn-lg btn-primary" href="#">Adopt</a></p>
                 </div>
+              </div>
             </div>
+
             <div className="carousel-item">
               <img src="src/images/petImage2.jpeg" className="d-block w-100" alt="Slide 2"/>
               <div className="container">
-                <div className="carousel-caption">
+                <div className="carousel-caption transparent-bg">
                   <h1>Finding family.</h1>
                   <p>Together, we make tails wag as we unite pets with their forever families, spreading happiness and love.</p>
                   <p><a className="btn btn-lg btn-primary" href="#">Donate</a></p>
@@ -67,7 +68,7 @@ function App() {
             <div className="carousel-item">
               <img src="src/images/petImage3.jpeg" className="d-block w-100" alt="Slide 3"/>
               <div className="container">
-                <div className="carousel-caption text-end">
+                <div className="carousel-caption text-end transparent-bg">
                   <h1>Transforming lives.</h1>
                   <p>From shelter to forever family, we're dedicated to guiding pets on their journey to finding lasting love and companionship.</p>
                   <p><a className="btn btn-lg btn-primary" href="#">Resources</a></p>
@@ -86,7 +87,9 @@ function App() {
         </div>
 
         <div className="container marketing">
-          <h2 className="fw-normal">Meet the team</h2>
+          <div className="team-heading-container">
+            <h2 className="fw-normal">Meet the team</h2>
+          </div>
           <div className="row">
             <div className="col-lg-4">
               <svg className="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
@@ -162,7 +165,7 @@ function App() {
         
         <footer className="container">
           <p className="float-end"><a href="#">Back to top</a></p>
-          <p>&copy; 2024 Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+          <p>&copy; 2024 PetRescue Network, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
         </footer>
       </main>
     </div>
