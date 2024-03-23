@@ -5,7 +5,7 @@
 body {
     padding-top: 3rem;
     padding-bottom: 3rem;
-    background-color: rgb(192, 201, 226);
+    background-color: rgb(204, 222, 241);
     color: rgb(var(--bs-tertiary-color-rgb));
   }
 
@@ -40,7 +40,7 @@ body {
   }
 
   .transparent-bg {
-    background-color: rgba(213, 201, 99, 0.372); /* Adjust the alpha (opacity) value as needed */
+    background-color: rgba(229, 229, 229, 0.753); /* Adjust the alpha (opacity) value as needed */
     padding: 20px; /* Add padding to create space between the text and container edges */
   }
   
@@ -60,8 +60,11 @@ body {
   -------------------------------------------------- */
   .team-heading-container {
     text-align: center;
-    margin-bottom: 20px; /* Adjust as needed to control spacing */
-    padding: 10px; /* Add padding to create space between the heading and borders */
+    /* margin-top: 10px; */
+    margin-bottom: 60px; /* Adjust as needed to control spacing */
+    border: 2px solid #000;
+    /* background-color: gray; */
+    padding: 10px; 
   }
 
   .team-heading-container h2 {
@@ -87,6 +90,7 @@ body {
   
   .featurette-divider {
     margin: 5rem 0; /* Space out the Bootstrap <hr> more */
+    border-top: 4px solid #000;
   }
   
   /* Thin out the marketing headings */
