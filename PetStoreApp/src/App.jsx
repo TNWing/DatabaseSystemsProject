@@ -54,7 +54,6 @@ function App() {
                 </div>
               </div>
             </div>
-
             <div className="carousel-item">
               <img src="src/images/petImage3.jpeg" className="d-block w-100" alt="Slide 2"/>
               <div className="container">

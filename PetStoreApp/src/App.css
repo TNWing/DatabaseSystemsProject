@@ -91,6 +91,8 @@ body {
   .featurette-divider {
     margin: 5rem 0; /* Space out the Bootstrap <hr> more */
     border-top: 4px solid #000;
+    margin-top: 20px; /* Add margin to control spacing */
+    margin-bottom: 20px; /* Add margin to control spacing */
   }
   
   /* Thin out the marketing headings */
