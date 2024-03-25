@@ -22,31 +22,32 @@ INSERT INTO Adopter (user_id, pet_id, adopt_history)
 VALUES 
     (1, 1, 'Adopted Buddy on 2023-01-10'),
     (2, 2, 'Adopted Whiskers on 2022-12-05');
-
-INSERT INTO Staff (user_id, org_id, task)
-VALUES 
-    (3, 1, 'Manager'),
-    (4, 2, 'Trainer');
-
-INSERT INTO Volunteer (user_id, org_id, hours_worked, task)
-VALUES 
-    (5, 1, 20, 'Animal care'),
-    (6, 2, 15, 'Event planning');
-
-INSERT INTO Donor (user_id)
-VALUES 
-    (7),
-    (8);
-
-INSERT INTO Donation (donation_id, donor_id, amount, description)
-VALUES 
-    (1, 7, 100.00, 'General donation'),
-    (2, 8, 50.00, 'Food donation');
-
+	
 INSERT INTO Organization (org_id, contact_info, oname, location)
 VALUES 
     (1, 'info@animalshelter.org', 'Local Animal Shelter', '123 Oak St'),
     (2, 'info@rescuegroup.org', 'Rescue Group', '789 Pine St');
+
+INSERT INTO Staff (user_id, org_id, task)
+VALUES 
+    (3, 1, 'Manager'),
+    (2, 2, 'Trainer');
+
+INSERT INTO Volunteer (user_id, org_id, hours_worked, task)
+VALUES 
+    (1, 1, 20, 'Animal care'),
+    (2, 2, 15, 'Event planning');
+
+INSERT INTO Donor (user_id)
+VALUES 
+    (1),
+    (2);
+
+INSERT INTO Donation (donation_id, donor_id, amount, description)
+VALUES 
+    (1, 1, 100.00, 'General donation'),
+    (2, 2, 50.00, 'Food donation');
+
 
 INSERT INTO Resources (r_id, URL, notes, org_id)
 VALUES 
@@ -60,11 +61,12 @@ VALUES
 
 INSERT INTO Adoption_Resources (r_id, adoption_fee)
 VALUES 
-    (2, 50.00),
-    (3, 75.00);
+    (1, 50.00),
+    (2, 75.00);
 
 INSERT INTO Pet_Resources (r_id, pet_food_brand)
 VALUES 
     (1, 'Acme Pet Food'),
     (2, 'Paws & Claws');
+
 
