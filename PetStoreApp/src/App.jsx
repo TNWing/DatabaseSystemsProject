@@ -1,6 +1,7 @@
 import React from 'react';
 import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
 import './App.css'
+import { handleSignIn } from './signIn.js'
 import {Button, Navbar, Container, Nav, NavDropdown} from "react-bootstrap";
 
 
@@ -29,7 +30,7 @@ function App() {
                   <a className="nav-link active custom-link" aria-current="page" href="#">RESOURCES</a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link active custom-link" aria-current="page" href="/users/login">SIGN IN</a>
+                  <a className="nav-link active custom-link" aria-current="page" href="/users/login" onClick={handleSignIn}>SIGN IN</a>
                 </li>
               </ul>
             </div>
