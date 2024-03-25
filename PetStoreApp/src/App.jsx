@@ -29,7 +29,7 @@ function App() {
                   <a className="nav-link active custom-link" aria-current="page" href="#">RESOURCES</a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link active custom-link" aria-current="page" href="#">SIGN IN</a>
+                  <a className="nav-link active custom-link" aria-current="page" href="/users/login">SIGN IN</a>
                 </li>
               </ul>
             </div>

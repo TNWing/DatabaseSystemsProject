@@ -1,28 +1,54 @@
 // npm init -y
 // npm install pg 
+import pg from 'pg';
+const { Client } = pg;
 
-const { Client } = require('pg')
 
-const client = new Client ({
-    host: "localhost",
+const client = new Client({
+    host: "192.168.0.213",
     user: "postgres",
     port: 5432,
-    password: "rootUser",
+    password: "JCOLLETTE",
     database: "postgres"
-})
+});
 
-module.exports = client
+async function connectToDatabase() {
+    try {
+        // Connect to the PostgreSQL database
+        await client.connect();
+        console.log('Connected to PostgreSQL database');
 
-client.connect()
-
-client.query(`Select * from users`, (err, res) => {
-    if(!err){
-        console.log(res.rows);
-    } else {
-        console.log(err.message);
+        // Execute a sample query
+        const query = 'SELECT * FROM Pet';
+        const result = await client.query(query);
+        console.log('Query results:', result.rows);
+    } catch (error) {
+        console.error('Error connecting to PostgreSQL database:', error);
+    } finally {
+        // Close the client connection
+        await client.end();
+        console.log('Connection to PostgreSQL closed');
     }
-    client.end;
-})
+}
 
-// node databasepg.js
+// Call the function to connect to the database
+connectToDatabase();
+
+// client.on('error', (err, client) => {
+//     console.error('Unexpected error on idle client', err);
+//     process.exit(-1);
+// });
+
+// client.connect()
+
+// client.query(`Select * from users`, (err, res) => {
+//     if(!err){
+//         console.log(res.rows);
+//     } else {
+//         console.log(err.message);
+//     }
+//     client.end;
+// })
+
+// to test: node databasepg.js
 // Creating an API https://www.youtube.com/watch?v=HO5iiDaZO2E
