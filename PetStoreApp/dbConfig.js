@@ -11,4 +11,13 @@ const pool = new Pool({
     connectionString: 'postgres://imbydddg:ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w@raja.db.elephantsql.com/imbydddg'
 });
 
+pool.connect((err, client, done) => {
+  if (err) {
+
+    console.error('Error connecting to the database', err);
+  } else {
+    console.log('Connected to the database');
+  }
+});
+//https://github.com/vitejs/vite/discussions/3396
 moduleExpression.exports = { pool }
