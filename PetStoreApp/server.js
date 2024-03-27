@@ -1,3 +1,5 @@
+import './dbConfig.cjs'
+import './databasepg.js'
 import express from 'express';
 const app = express();
 import bcrypt from 'bcrypt';
@@ -23,7 +25,6 @@ app.get('/users/login', (req, res) => {
 app.get('/users/dashboard', (req, res) => {
     res.render('dashboard', {user: "Dante"})
 });
-
 app.post('/users/register', async (req, res) => {
     let { name, email, password, password2 } = req.body;
 
