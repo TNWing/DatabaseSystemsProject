@@ -12,7 +12,7 @@ const connectionString = `postgressql://${process.env.DB_USER}:${process.env.DB_
 
 const pool = new Pool({
     //connectionString: isProduction ? process.env.DB_DATABASE_URL : connectionString
-    connectionString: 'postgres://imbydddg:ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w@raja.db.elephantsql.com/imbydddg?sslmode=require'
+    connectionString: 'postgres://imbydddg:ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w@raja.db.elephantsql.com/imbydddg'
 });
 
 pool.connect((err, client, done) => {
@@ -30,6 +30,7 @@ app.listen(port,()=>{
 
 //https://github.com/vitejs/vite/discussions/3396
 module.exports = { pool }
+/*
 const createDB= "CREATE DATABASE PetAdoption "+
                    "WITH "+
                    "OWNER = postgres "+
@@ -40,10 +41,11 @@ const createDB= "CREATE DATABASE PetAdoption "+
                    "CONNECTION LIMIT = -1 "+
                    "TEMPLATE = template0;";
 
-const seeDB="SELECT name FROM sys.databases;";
-const checkDB="SELECT * FROM PetAdoption";
+const checkTable="SELECT * FROM PetAdoption";
+console.log("HEY");
+const createTable="CREATE TABLE TEST(id int)";
 pool.query(
-   checkDB, (err,result)=>{
+   createTable, (err,result)=>{
         if (err) {
           console.error('Error creating the users table', err);
         } else {
@@ -51,3 +53,14 @@ pool.query(
         }
       }
 );
+console.log("HEY2");
+const checkTable="SELECT * FROM TEST";
+pool.query(
+   checkTable, (err,result)=>{
+        if (err) {
+          console.error('Error creating the users table', err);
+        } else {
+          console.log('Users table created successfully');
+        }
+      }
+);*/

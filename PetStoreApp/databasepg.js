@@ -4,13 +4,21 @@ import pg from 'pg';
 const { Client } = pg;
 
 
-const client = new Client({
+const clientO = new Client({
     host: "192.168.0.213",
     user: "postgres",
     port: 5432,
     password: "JCOLLETTE",
     database: "postgres"
 });
+const client=new Client({
+    host:"raja.db.elephantsql.com",
+    user:"imbydddg",
+    port:5432,
+    password:"ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w",
+    database:"imbydddg"
+});
+
 
 async function connectToDatabase() {
     try {
