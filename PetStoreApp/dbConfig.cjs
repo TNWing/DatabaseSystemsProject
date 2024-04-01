@@ -40,6 +40,80 @@ const createDB= "CREATE DATABASE PetAdoption "+
                    "TABLESPACE = pg_default "+
                    "CONNECTION LIMIT = -1 "+
                    "TEMPLATE = template0;";
+const createBreedTable="CREATE TABLE Breeds (breed_id INT PRIMARY KEY,bname VARCHAR(255),btype VARCHAR(255))";
+const createPetTable="CREATE TABLE Pets ("+
+                          "pet_id INT PRIMARY KEY,"+
+                          "pname VARCHAR(255),"+
+                          "species VARCHAR(255),"+
+                          "breed_id INT,"+
+                          "age INT,"+
+                          "description TEXT,"+
+                          "FOREIGN KEY (breed_id) REFERENCES Breeds(breed_id)";
+const checkBreeds="SELECT * From Breeds";
 
-const checkTable="SELECT * FROM PetAdoption";
-console.log("HEY");
+
+const newBreed="INSERT INTO Breeds Values (1, 'Beagle', 'Dog')";
+const delBeagle="DELETE FROM Breeds WHERE breed_id=1";
+pool.query(
+   createBreedTable, (err,result)=>{
+        if (err) {
+          console.error('Error creating the users table', err);
+        } else {
+          console.log('Users table created successfully');
+        }
+      }
+);
+pool.query(
+   createPetTable, (err,result)=>{
+        if (err) {
+          console.error('Error creating the users table', err);
+        } else {
+          console.log('Users table created successfully');
+        }
+      }
+);
+pool.query(
+   checkBreeds, (err,result)=>{
+        if (err) {
+          console.error('Error creating the users table', err);
+        } else {
+          console.log(result);
+        }
+      }
+);
+pool.query(
+   newBreed, (err,result)=>{
+        if (err) {
+          console.error('Error creating the users table', err);
+        } else {
+          console.log('New Breed');
+        }
+      }
+);
+pool.query(
+   checkBreeds, (err,result)=>{
+        if (err) {
+          console.error('Error creating the users table', err);
+        } else {
+          console.log(result);
+        }
+      }
+);
+pool.query(
+   delBeagle, (err,result)=>{
+        if (err) {
+          console.error('Error creating the users table', err);
+        } else {
+          console.log("DELETED BEAGLE");
+        }
+      }
+);
+pool.query(
+   checkBreeds, (err,result)=>{
+        if (err) {
+          console.error('Error creating the users table', err);
+        } else {
+          console.log(result);
+        }
+      }
+);
