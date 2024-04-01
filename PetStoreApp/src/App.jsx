@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 // import { handleSignIn } from './signIn.js'
 // import {Button, Container, Nav, NavDropdown} from "react-bootstrap";
 import Footer from './components/Footer';
+import { Link } from 'react-router-dom'
 
 
 function App() {
@@ -27,7 +28,7 @@ function App() {
                 <div className="carousel-caption text-start transparent-bg">
                   <h1>Bringing joy.</h1>
                   <p className="opacity-75">Join us in our mission to bring joy into the lives of pets and people alike, one adoption at a time.</p>
-                  <p><a className="btn btn-lg btn-primary" href="#">Adopt</a></p>
+                  <p><Link className="btn btn-lg btn-primary" href="#">Adopt</Link></p>
                 </div>
               </div>
             </div>
@@ -47,7 +48,7 @@ function App() {
                 <div className="carousel-caption text-end transparent-bg">
                   <h1>Transforming lives.</h1>
                   <p>From shelter to forever family, we're dedicated to guiding pets on their journey to finding lasting love and companionship.</p>
-                  <p><a className="btn btn-lg btn-primary" href="/resources">Resources</a></p>
+                  <p><Link className="btn btn-lg btn-primary" href="/resources">Resources</Link></p>
                 </div>
               </div>
             </div>

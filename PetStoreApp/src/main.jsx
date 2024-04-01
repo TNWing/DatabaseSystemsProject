@@ -8,6 +8,7 @@ import {
   Router
 } from "react-router-dom"
 import Resources from './Resources.jsx'
+import Donate from './Donate.jsx'
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
   {
     path: "resources",
     element: <Resources/>
+  },
+  {
+    path: "donate",
+    element: <Donate/>
   }
 ])
 
