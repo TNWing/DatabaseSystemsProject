@@ -30,7 +30,7 @@ app.listen(port,()=>{
 
 //https://github.com/vitejs/vite/discussions/3396
 module.exports = { pool }
-/*
+
 const createDB= "CREATE DATABASE PetAdoption "+
                    "WITH "+
                    "OWNER = postgres "+
@@ -43,24 +43,3 @@ const createDB= "CREATE DATABASE PetAdoption "+
 
 const checkTable="SELECT * FROM PetAdoption";
 console.log("HEY");
-const createTable="CREATE TABLE TEST(id int)";
-pool.query(
-   createTable, (err,result)=>{
-        if (err) {
-          console.error('Error creating the users table', err);
-        } else {
-          console.log('Users table created successfully');
-        }
-      }
-);
-console.log("HEY2");
-const checkTable="SELECT * FROM TEST";
-pool.query(
-   checkTable, (err,result)=>{
-        if (err) {
-          console.error('Error creating the users table', err);
-        } else {
-          console.log('Users table created successfully');
-        }
-      }
-);*/

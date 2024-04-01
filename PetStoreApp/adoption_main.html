@@ -72,16 +72,15 @@ const filterMap=new Map();
 const filterEnabled=false;
     function initMap(){
         filterMap.set('Species',[]);
-        console.log(filterMap.get('Species'));
     }
     function switchCollapse(a){
-    if (a.style.display == "block") {
-        a.style.display = "none";
-    }
-    else {
-      a.style.display = "block";
-    }
-};
+        if (a.style.display == "block") {
+            a.style.display = "none";
+        }
+        else {
+          a.style.display = "block";
+        }
+    };
     function openFilters(){
         ele=document.getElementById("filter_body");
         if (ele.style.display == "block") {
@@ -100,13 +99,18 @@ const filterEnabled=false;
         else{
             filterMap.get(type).push(filterName);
         }
-
-        console.log(filterMap.get(type));
     }
 
     function resetFilters(){
-
+        filterMap.clear();
     }
+
+    function updatePage(){
+        var query="";
+    }
+
+
+
 initMap();
 </script>
 </body>

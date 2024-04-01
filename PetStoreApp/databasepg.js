@@ -4,17 +4,10 @@ import pg from 'pg';
 const { Client } = pg;
 
 
-const clientO = new Client({
-    host: "192.168.0.213",
-    user: "postgres",
-    port: 5432,
-    password: "JCOLLETTE",
-    database: "postgres"
-});
 const client=new Client({
     host:"raja.db.elephantsql.com",
     user:"imbydddg",
-    port:5432,
+    port:5173,
     password:"ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w",
     database:"imbydddg"
 });
@@ -40,7 +33,7 @@ async function connectToDatabase() {
 }
 
 // Call the function to connect to the database
-//connectToDatabase();
+connectToDatabase();
 
 // client.on('error', (err, client) => {
 //     console.error('Unexpected error on idle client', err);
