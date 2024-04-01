@@ -12,6 +12,7 @@ const connectionString = `postgressql://${process.env.DB_USER}:${process.env.DB_
 
 const pool = new Pool({
     //connectionString: isProduction ? process.env.DB_DATABASE_URL : connectionString
+    idleTimeoutMillis: 0
     connectionString: 'postgres://imbydddg:ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w@raja.db.elephantsql.com/imbydddg'
 });
 
@@ -23,7 +24,7 @@ pool.connect((err, client, done) => {
     console.log('Connected to the database');
   }
 });
-const port = process.env.PORT || 5173;
+const port = process.env.PORT || 6173;
 app.listen(port,()=>{
     console.log('server is on port ${port}');
 });
@@ -117,3 +118,33 @@ pool.query(
         }
       }
 );
+/*
+async function runQueries() {
+  try {
+    let result = await pool.query(createBreedTable);
+    console.log('Users table created successfully');
+
+    result = await pool.query(createPetTable);
+    console.log('Users table created successfully');
+
+    result = await pool.query(checkBreeds);
+    console.log(result);
+
+    result = await pool.query(newBreed);
+    console.log('New Breed');
+
+    result = await pool.query(checkBreeds);
+    console.log(result);
+
+    result = await pool.query(delBeagle);
+    console.log("DELETED BEAGLE");
+
+    result = await pool.query(checkBreeds);
+    console.log(result);
+  } catch (err) {
+    console.error('Error executing query', err);
+  }
+}
+
+runQueries();
+*/

@@ -7,7 +7,7 @@ const { Client } = pg;
 const client=new Client({
     host:"raja.db.elephantsql.com",
     user:"imbydddg",
-    port:5173,
+    port:5273,
     password:"ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w",
     database:"imbydddg"
 });
