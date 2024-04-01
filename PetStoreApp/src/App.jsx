@@ -1,41 +1,18 @@
 import React from 'react';
 import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
 import './App.css'
-import { handleSignIn } from './signIn.js'
-import {Button, Navbar, Container, Nav, NavDropdown} from "react-bootstrap";
+import Navbar from './components/Navbar';
+// import { handleSignIn } from './signIn.js'
+// import {Button, Container, Nav, NavDropdown} from "react-bootstrap";
+import Footer from './components/Footer';
+import { Link } from 'react-router-dom'
 
 
 function App() {
   return (
     <div>
       <header data-bs-theme="dark">
-        <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-          <div className="container-fluid">
-            <a className="navbar-brand" href="#">PetRescueNetwork</a>
-            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-              <span className="navbar-toggler-icon"></span>
-            </button>
-            <div className="collapse navbar-collapse" id="navbarCollapse">
-              <ul className="navbar-nav me-auto mb-2 mb-md-0">
-                <li className="nav-item">
-                  <a className="nav-link active custom-link" aria-current="page" href="#">ADOPT</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link active custom-link" aria-current="page" href="#">DONATE</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link active custom-link" aria-current="page" href="#">VOLUNTEER</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link active custom-link" aria-current="page" href="#">RESOURCES</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link active custom-link" aria-current="page" href="/users/login" onClick={handleSignIn}>SIGN IN</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </nav>
+        <Navbar/>
       </header>
       <main>
         <div id="myCarousel" className="carousel slide mb-6" data-bs-ride="carousel">
@@ -51,7 +28,7 @@ function App() {
                 <div className="carousel-caption text-start transparent-bg">
                   <h1>Bringing joy.</h1>
                   <p className="opacity-75">Join us in our mission to bring joy into the lives of pets and people alike, one adoption at a time.</p>
-                  <p><a className="btn btn-lg btn-primary" href="#">Adopt</a></p>
+                  <p><Link className="btn btn-lg btn-primary" href="#">Adopt</Link></p>
                 </div>
               </div>
             </div>
@@ -71,7 +48,7 @@ function App() {
                 <div className="carousel-caption text-end transparent-bg">
                   <h1>Transforming lives.</h1>
                   <p>From shelter to forever family, we're dedicated to guiding pets on their journey to finding lasting love and companionship.</p>
-                  <p><a className="btn btn-lg btn-primary" href="#">Resources</a></p>
+                  <p><Link className="btn btn-lg btn-primary" href="/resources">Resources</Link></p>
                 </div>
               </div>
             </div>
@@ -163,11 +140,7 @@ function App() {
           <hr className="featurette-divider" />
           {/* End Featurettes */}
         </div>
-        
-        <footer className="container">
-          <p className="float-end"><a href="#">Back to top</a></p>
-          <p>&copy; 2024 PetRescue Network, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
-        </footer>
+        <Footer/>
       </main>
     </div>
   );
