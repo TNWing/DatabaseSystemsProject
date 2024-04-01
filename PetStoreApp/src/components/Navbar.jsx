@@ -1,12 +1,14 @@
 import React from "react";
 import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
 import { NavDropdown } from "react-bootstrap";
+import { Link } from 'react-router-dom'
+
 
 function Navbar() {
     return(
         <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
           <div className="container-fluid">
-            <a className="navbar-brand" href="#">PetRescueNetwork</a>
+            <Link className="navbar-brand" to="/">PetRescueNetwork</Link>
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
               <span className="navbar-toggler-icon"></span>
             </button>
@@ -22,7 +24,7 @@ function Navbar() {
                   <a className="nav-link active custom-link" aria-current="page" href="#">VOLUNTEER</a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link active custom-link" aria-current="page" href="#">RESOURCES</a>
+                  <Link className="nav-link active custom-link" aria-current="page" to="/resources">RESOURCES</Link>
                 </li>
                 <li className="nav-item">
                   <a className="nav-link active custom-link" aria-current="page" href="/users/login">SIGN IN</a>

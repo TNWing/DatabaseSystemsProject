@@ -46,7 +46,7 @@ function App() {
                 <div className="carousel-caption text-end transparent-bg">
                   <h1>Transforming lives.</h1>
                   <p>From shelter to forever family, we're dedicated to guiding pets on their journey to finding lasting love and companionship.</p>
-                  <p><a className="btn btn-lg btn-primary" href="#">Resources</a></p>
+                  <p><a className="btn btn-lg btn-primary" href="/resources">Resources</a></p>
                 </div>
               </div>
             </div>
