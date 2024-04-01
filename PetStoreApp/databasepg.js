@@ -40,7 +40,7 @@ async function connectToDatabase() {
 }
 
 // Call the function to connect to the database
-connectToDatabase();
+//connectToDatabase();
 
 // client.on('error', (err, client) => {
 //     console.error('Unexpected error on idle client', err);
