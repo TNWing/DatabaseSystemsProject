@@ -23,7 +23,7 @@ pool.connect((err, client, done) => {
     console.log('Connected to the database');
   }
 });
-const port = process.env.PORT || 5173;
+const port = process.env.PORT || 5174;
 app.listen(port,()=>{
     console.log('server is on port ${port}');
 });
