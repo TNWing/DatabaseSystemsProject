@@ -1,32 +1,39 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Router
-} from "react-router-dom"
-import Resources from './Resources.jsx'
-import Donate from './Donate.jsx'
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import App from './App.jsx';
+import './index.css';
+import Resources from './Resources.jsx';
+import Donate from './Donate.jsx';
+import Home from './home.jsx';
+import Login from './login.jsx';
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App/>
-  },
-  {
-    path: "resources",
-    element: <Resources/>
-  },
-  {
-    path: "donate",
-    element: <Donate/>
-  }
-])
+function Main() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [email, setEmail] = useState('');
+
+  return (
+    <div className="Main">
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={<App email={email} loggedIn={loggedIn} setLoggedIn={setLoggedIn} />}
+          />
+          <Route path="/login" element={<Login setLoggedIn={setLoggedIn} setEmail={setEmail} />} />
+          <Route path="/resources" element={<Resources />} />
+          <Route path="/donate" element={<Donate />} />
+          <Route path="/home" element={<Home email={email} loggedIn={loggedIn} />} />
+        </Routes>
+      </BrowserRouter>
+    </div>
+  );
+}
+
+export default Main;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router}/>
-  </React.StrictMode>,
-)
+    <Main />
+  </React.StrictMode>
+);

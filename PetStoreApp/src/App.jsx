@@ -2,8 +2,6 @@ import React from 'react';
 import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
 import './App.css'
 import Navbar from './components/Navbar';
-// import { handleSignIn } from './signIn.js'
-// import {Button, Container, Nav, NavDropdown} from "react-bootstrap";
 import Footer from './components/Footer';
 import { Link } from 'react-router-dom'
 
@@ -148,7 +146,7 @@ function App() {
 
 export default App;
 
-{/* <form className="d-flex" role="search">
+/* <form className="d-flex" role="search">
                 <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                 <button className="btn btn-outline-success" type="submit">Search</button>
-              </form> */}
+              </form> */
