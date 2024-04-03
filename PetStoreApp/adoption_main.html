@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!--
-<script type="module" src="./adoption_main.js"></script>
--->
+
+<script type="text/javascript" src="./adoption_main.js" crossorigin="anonymous"></script>
+
     <meta charset="UTF-8">
     <title>Adopt a Pet!</title>
     <style>
@@ -68,50 +68,7 @@
         </div>
     </div>
 <script>
-const filterMap=new Map();
-const filterEnabled=false;
-    function initMap(){
-        filterMap.set('Species',[]);
-    }
-    function switchCollapse(a){
-        if (a.style.display == "block") {
-            a.style.display = "none";
-        }
-        else {
-          a.style.display = "block";
-        }
-    };
-    function openFilters(){
-        ele=document.getElementById("filter_body");
-        if (ele.style.display == "block") {
-            ele.style.display = "none";
-        }
-        else {
-          ele.style.display = "block";
-        }
-    }
 
-    function setFilters(type,filterName){
-        if (filterMap.get(type).find((element) => element==filterName)){
-            index=filterMap.get(type).indexOf(filterName)
-            filterMap.get(type).splice(index, 1);
-        }
-        else{
-            filterMap.get(type).push(filterName);
-        }
-    }
-
-    function resetFilters(){
-        filterMap.clear();
-    }
-
-    function updatePage(){
-        var query="";
-    }
-
-
-
-initMap();
 </script>
 </body>
 </html>

@@ -1,14 +1,54 @@
-import './dbConfig.cjs'
+import './dbConfig.js'
 import './databasepg.js'
+import { pool } from './dbConfig.js'
 import express from 'express';
+import cors from 'cors'
+
 const app = express();
 import bcrypt from 'bcrypt';
-// import { pool } from "./dbConfig.js";
-
-const PORT = process.env.PORT || 4000;
-
+const PORT = 5273;
 app.set("view engine", "ejs")
+app.set('port',PORT)
+app.use(cors());
 app.use(express.urlencoded({ extended: false }))
+app.use(express.text())
+app.use((req, res, next) => {
+    res.header('Content-Type', 'text/plain');
+    next();
+});
+function sqlSelect(query){
+    pool.query(
+       query, (err,result)=>{
+            if (err) {
+              console.error('Error', err);
+            } else {
+            //result is an arr or list of objs, each obj is a row
+                console.log(result);
+              return result;
+            }
+          }
+    );
+}
+
+//NOTE WHEN STARTING THE SERVER, it listens on port 5173, but app cant
+//listen to that port
+/*
+THE ISSUE:
+Vite sets up the server on port 5173. However, that means i cannot access
+this port here, so app has to be assigned a different port
+*/
+app.listen(app.get('port'), () => {
+  console.log("Express server listening on port " + app.get('port'));
+});
+
+
+app.post('/select', (req, res) => {
+  // Replace this with the actual data you want to send.
+  console.log("THIS IS REQ BODY");
+  const data = sqlSelect(req.body);
+  console.log(data);
+  res.send(data);
+});
 
 app.get('/', (req, res) => {
     res.render('index')
@@ -68,8 +108,4 @@ app.post('/users/register', async (req, res) => {
         //     }
         // )
     }
-})
-
-app.listen(PORT, ()=> {
-    console.log(`Server running on port ${PORT}`);
 })

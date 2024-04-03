@@ -18,7 +18,7 @@ function App() {
             <div className="collapse navbar-collapse" id="navbarCollapse">
               <ul className="navbar-nav me-auto mb-2 mb-md-0">
                 <li className="nav-item">
-                  <a className="nav-link active custom-link" aria-current="page" href="#">ADOPT</a>
+                  <a className="nav-link active custom-link" aria-current="page" href="./adoption_main.html">ADOPT</a>
                 </li>
                 <li className="nav-item">
                   <a className="nav-link active custom-link" aria-current="page" href="#">DONATE</a>
@@ -51,7 +51,7 @@ function App() {
                 <div className="carousel-caption text-start transparent-bg">
                   <h1>Bringing joy.</h1>
                   <p className="opacity-75">Join us in our mission to bring joy into the lives of pets and people alike, one adoption at a time.</p>
-                  <p><a className="btn btn-lg btn-primary" href="#">Adopt</a></p>
+                  <p><a className="btn btn-lg btn-primary" href="./adoption_main.html">Adopt</a></p>
                 </div>
               </div>
             </div>

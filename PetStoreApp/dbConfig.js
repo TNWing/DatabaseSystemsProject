@@ -1,18 +1,15 @@
-//require("dotenv").config();
-require("dotenv").config();
-const express = require('express');
-const app = express();
-const { Pool } = require("pg");
-const morgan = require('morgan');
+import * as express from 'express';
+import pkg from 'pg';
+const { Pool } = pkg;
+import morgan from 'morgan';
 const isProduction = process.env.NODE_ENV === "production";
-app.use(morgan('dev'));
 
-
+console.log("dbc");
 const connectionString = `postgressql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`
 
 const pool = new Pool({
     //connectionString: isProduction ? process.env.DB_DATABASE_URL : connectionString
-    idleTimeoutMillis: 0
+    idleTimeoutMillis: 0,
     connectionString: 'postgres://imbydddg:ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w@raja.db.elephantsql.com/imbydddg'
 });
 
@@ -24,13 +21,9 @@ pool.connect((err, client, done) => {
     console.log('Connected to the database');
   }
 });
-const port = process.env.PORT || 6173;
-app.listen(port,()=>{
-    console.log('server is on port ${port}');
-});
 
 //https://github.com/vitejs/vite/discussions/3396
-module.exports = { pool }
+export {pool};
 
 const createDB= "CREATE DATABASE PetAdoption "+
                    "WITH "+
@@ -49,16 +42,17 @@ const createPetTable="CREATE TABLE Pets ("+
                           "breed_id INT,"+
                           "age INT,"+
                           "description TEXT,"+
-                          "FOREIGN KEY (breed_id) REFERENCES Breeds(breed_id)";
+                          "FOREIGN KEY (breed_id) REFERENCES Breeds(breed_id))";
 const checkBreeds="SELECT * From Breeds";
 
 
 const newBreed="INSERT INTO Breeds Values (1, 'Beagle', 'Dog')";
 const delBeagle="DELETE FROM Breeds WHERE breed_id=1";
+
 pool.query(
    createBreedTable, (err,result)=>{
         if (err) {
-          console.error('Error creating the users table', err);
+          console.error('Error creating the breeds table', err);
         } else {
           console.log('Users table created successfully');
         }
@@ -67,21 +61,14 @@ pool.query(
 pool.query(
    createPetTable, (err,result)=>{
         if (err) {
-          console.error('Error creating the users table', err);
+          console.error('Error creating the pet table', err);
         } else {
           console.log('Users table created successfully');
         }
       }
 );
-pool.query(
-   checkBreeds, (err,result)=>{
-        if (err) {
-          console.error('Error creating the users table', err);
-        } else {
-          console.log(result);
-        }
-      }
-);
+
+
 pool.query(
    newBreed, (err,result)=>{
         if (err) {
@@ -91,15 +78,8 @@ pool.query(
         }
       }
 );
-pool.query(
-   checkBreeds, (err,result)=>{
-        if (err) {
-          console.error('Error creating the users table', err);
-        } else {
-          console.log(result);
-        }
-      }
-);
+
+/*
 pool.query(
    delBeagle, (err,result)=>{
         if (err) {
@@ -109,16 +89,7 @@ pool.query(
         }
       }
 );
-pool.query(
-   checkBreeds, (err,result)=>{
-        if (err) {
-          console.error('Error creating the users table', err);
-        } else {
-          console.log(result);
-        }
-      }
-);
-/*
+
 async function runQueries() {
   try {
     let result = await pool.query(createBreedTable);
@@ -147,4 +118,5 @@ async function runQueries() {
 }
 
 runQueries();
+
 */

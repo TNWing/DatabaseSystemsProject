@@ -1,13 +1,10 @@
-// npm init -y
-// npm install pg 
 import pg from 'pg';
 const { Client } = pg;
-
 
 const client=new Client({
     host:"raja.db.elephantsql.com",
     user:"imbydddg",
-    port:5273,
+    port:5373,
     password:"ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w",
     database:"imbydddg"
 });
