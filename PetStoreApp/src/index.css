@@ -115,3 +115,18 @@ input[type='button'] {
   border-radius: 8px;
   cursor: pointer;
 }
+
+/* for Donate*/
+
+.donate-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Adjust the height as needed */
+}
+
+.form-group {
+  margin-bottom: 20px; /* Add spacing between form elements */
+}
+
+/* Optionally, you can add more custom styling for the form elements */
