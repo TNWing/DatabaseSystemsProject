@@ -17,10 +17,10 @@ function Navbar() {
                   <a className="nav-link active custom-link" aria-current="page" href="#">ADOPT</a>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link active custom-link" aria-current="page" to="/donate">DONATE</Link>
+                  <Link className="nav-link active custom-link" aria-current="page" to="/empDashboard">empDashboard</Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link active custom-link" aria-current="page" to="/volunteer">VOLUNTEER</Link>
+                  <Link className="nav-link active custom-link" aria-current="page" to="/userDashboard">userDashboard</Link>
                 </li>
                 <li className="nav-item">
                   <Link className="nav-link active custom-link" aria-current="page" to="/resources">RESOURCES</Link>
