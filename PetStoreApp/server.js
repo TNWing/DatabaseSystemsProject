@@ -16,11 +16,12 @@ app.use((req, res, next) => {
     res.header('Content-Type', 'text/plain');
     next();
 });
-function sqlSelect(query){
-    pool.query(
+async function sqlSelect(query){
+    await pool.query(
        query, (err,result)=>{
             if (err) {
               console.error('Error', err);
+              return -1;
             } else {
             //result is an arr or list of objs, each obj is a row
                 console.log(result);
@@ -30,13 +31,35 @@ function sqlSelect(query){
     );
 }
 
-//NOTE WHEN STARTING THE SERVER, it listens on port 5173, but app cant
-//listen to that port
-/*
-THE ISSUE:
-Vite sets up the server on port 5173. However, that means i cannot access
-this port here, so app has to be assigned a different port
-*/
+async function sqlInsert(query){
+    await pool.query(
+        query,(err,results)=>{
+            if (err) {
+              console.error('Error', err);
+              return -1;
+            } else {
+            //result is an arr or list of objs, each obj is a row
+                console.log(result);
+              return 1;
+            }
+        }
+    )
+}
+
+async function sqlModify(query){
+    await pool.query(
+        query,(err,results)=>{
+            if (err) {
+              console.error('Error', err);
+              return -1;
+            } else {
+            //result is an arr or list of objs, each obj is a row
+                console.log(result);
+              return 1;
+            }
+        }
+    )
+}
 app.listen(app.get('port'), () => {
   console.log("Express server listening on port " + app.get('port'));
 });
@@ -49,7 +72,16 @@ app.post('/select', (req, res) => {
   console.log(data);
   res.send(data);
 });
-
+app.post('/insert', (req, res) => {
+  // Replace this with the actual data you want to send.
+  const data=sqlInsert(req.body);
+  res.send(data);
+});
+app.post('/modify', (req, res) => {//can just use this for insert,update,delete
+  // Replace this with the actual data you want to send.
+  const data=sqlModify(req.body);
+  res.send(data);
+});
 app.get('/', (req, res) => {
     res.render('index')
 });

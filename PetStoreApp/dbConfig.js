@@ -21,7 +21,9 @@ pool.connect((err, client, done) => {
     console.log('Connected to the database');
   }
 });
-
+/*
+use await before each query
+*/
 //https://github.com/vitejs/vite/discussions/3396
 export {pool};
 
