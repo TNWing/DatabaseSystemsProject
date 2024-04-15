@@ -1,5 +1,7 @@
 // npm init -y
 // npm install pg 
+import express from 'express';
+import bodyParser from 'body-parser';
 import pg from 'pg';
 const { Client } = pg;
 
@@ -7,10 +9,13 @@ const { Client } = pg;
 const client=new Client({
     host:"raja.db.elephantsql.com",
     user:"imbydddg",
-    port:5173,
+    port:5174,
     password:"ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w",
     database:"imbydddg"
 });
+
+const app = express();
+const port = 5175;
 
 
 async function connectToDatabase() {
@@ -53,3 +58,41 @@ connectToDatabase();
 
 // to test: node databasepg.js
 // Creating an API https://www.youtube.com/watch?v=HO5iiDaZO2E
+
+
+// Middleware for parsing form data
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Handle form submission
+app.post('/submit', async (req, res) => {
+  try {
+    const { name, contact_info, address, date_of_birth, organization, task } = req.body;
+
+    // Insert into the people table
+    const peopleQuery = `
+      INSERT INTO people (name, contact_info, address, date_of_birth)
+      VALUES ($1, $2, $3, $4)
+      RETURNING user_id
+    `;
+    const peopleValues = [name, contact_info, address, date_of_birth];
+    const { rows: peopleRows } = await pool.query(peopleQuery, peopleValues);
+    const userId = peopleRows[0].user_id;
+
+    // Insert into the volunteer table
+    const volunteerQuery = `
+      INSERT INTO volunteer (user_id, organization_id, task)
+      VALUES ($1, $2, $3)
+    `;
+    const volunteerValues = [userId, organization, task];
+    await pool.query(volunteerQuery, volunteerValues);
+
+    res.send('Form submitted successfully!');
+  } catch (error) {
+    console.error('Error submitting form:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});
