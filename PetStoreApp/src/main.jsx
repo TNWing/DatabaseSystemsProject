@@ -7,6 +7,8 @@ import Resources from './Resources.jsx';
 import Donate from './Donate.jsx';
 import Home from './home.jsx';
 import Login from './register.jsx';
+import UserDashboard from './userDashboard.jsx';
+import EmpDashboard from './empDashboard.jsx';
 
 function Main() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -24,6 +26,9 @@ function Main() {
           <Route path="/resources" element={<Resources />} />
           <Route path="/donate" element={<Donate />} />
           <Route path="/home" element={<Home email={email} loggedIn={loggedIn} />} />
+          <Route path="/resources" element={<Resources />} />
+          <Route path="/empDashboard" element={<EmpDashboard />} />
+          <Route path="/userDashboard" element={<UserDashboard />} />
         </Routes>
       </BrowserRouter>
     </div>
@@ -32,7 +37,9 @@ function Main() {
 
 export default Main;
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const rootElement = document.getElementById('root');
+
+createRoot(rootElement).render(
   <React.StrictMode>
     <Main />
   </React.StrictMode>

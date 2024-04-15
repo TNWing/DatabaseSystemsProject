@@ -50,6 +50,12 @@ function Navbar() {
         <div className="collapse navbar-collapse" id="navbarCollapse">
           <ul className="navbar-nav">
             <li className="nav-item">
+                  <Link className="nav-link active custom-link" aria-current="page" to="/empDashboard">empDashboard</Link>
+            </li>
+            <li className="nav-item">
+                  <Link className="nav-link active custom-link" aria-current="page" to="/userDashboard">userDashboard</Link>
+            </li>
+            <li className="nav-item">
               <Link
                 className="nav-link active custom-link"
                 aria-current="page"
