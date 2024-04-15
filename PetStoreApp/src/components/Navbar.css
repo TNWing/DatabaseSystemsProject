@@ -1,0 +1,24 @@
+
+  .navbar-nav .nav-link {
+    color: white; /* Make navbar links white */
+  }
+
+  .form-group {
+    display: inline;
+    margin-right: 10px;
+  }
+  
+  .login-form .form-group {
+    margin-bottom: 1rem; /* Add margin bottom for form groups */
+  }
+  
+  .login-form input[type="text"],
+  .login-form input[type="password"] {
+    width: 75%; /* Set input width to 100% */
+    padding: 0.8rem; /* Add padding to inputs */
+  }
+  
+  .login-form .error-message {
+    color: red; /* Make error messages red */
+  }
+  
