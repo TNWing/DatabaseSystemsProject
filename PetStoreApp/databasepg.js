@@ -5,11 +5,11 @@ import bodyParser from 'body-parser';
 import pg from 'pg';
 const { Client } = pg;
 
-
 const client=new Client({
     host:"raja.db.elephantsql.com",
     user:"imbydddg",
-    port:5174,
+    // port:5174,
+    port:5173,
     password:"ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w",
     database:"imbydddg"
 });
@@ -17,8 +17,7 @@ const client=new Client({
 const app = express();
 const port = 5175;
 
-
-async function connectToDatabase() {
+async function connectToDatabase() { 
     try {
         // Connect to the PostgreSQL database
         await client.connect();
@@ -58,7 +57,6 @@ connectToDatabase();
 
 // to test: node databasepg.js
 // Creating an API https://www.youtube.com/watch?v=HO5iiDaZO2E
-
 
 // Middleware for parsing form data
 app.use(bodyParser.urlencoded({ extended: true }));
