@@ -39,7 +39,7 @@ export default Main;
 
 const rootElement = document.getElementById('root');
 
-createRoot(rootElement).render(
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <Main />
   </React.StrictMode>

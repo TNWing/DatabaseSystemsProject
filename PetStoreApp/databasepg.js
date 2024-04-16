@@ -8,7 +8,6 @@ const { Client } = pg;
 const client=new Client({
     host:"raja.db.elephantsql.com",
     user:"imbydddg",
-    // port:5174,
     port:5173,
     password:"ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w",
     database:"imbydddg"
@@ -39,6 +38,29 @@ async function connectToDatabase() {
 // Call the function to connect to the database
 connectToDatabase();
 
+app.post('/register', async (req, res) => {
+  console.log("here");
+  const { email, fname, lname, phonenumber, address } = req.body;
+
+  try {
+    const userQuery = `
+      INSERT INTO users (email, fname, lname, phonenumber, address)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `;
+    const userValues = [email, fname, lname, phonenumber, address];
+    const { rows: userRows } = await pool.query(userQuery, userValues);
+    const userId = userRows[0].user_id;
+    
+    // Send success response
+    res.send('User registered')
+  } catch (error) {
+    // Handle errors
+    console.error('Error registering user:', error);
+    // Send error response
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 // client.on('error', (err, client) => {
 //     console.error('Unexpected error on idle client', err);
 //     process.exit(-1);
@@ -54,9 +76,6 @@ connectToDatabase();
 //     }
 //     client.end;
 // })
-
-// to test: node databasepg.js
-// Creating an API https://www.youtube.com/watch?v=HO5iiDaZO2E
 
 // Middleware for parsing form data
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -94,3 +113,5 @@ app.post('/submit', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
+
+console.log("Here")
