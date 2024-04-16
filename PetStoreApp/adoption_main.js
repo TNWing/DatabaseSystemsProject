@@ -2,7 +2,7 @@
 change the code to send the server requests
 */
 
-const availableSpecies=[];
+let availableSpecies=[];
 const filterMap=new Map();
 const filterEnabled=false;
 const PORT= 5273;
@@ -175,3 +175,5 @@ updatePage();
 window.onload=function(){
     addEventListeners();
 }
+
+modules.exports={};

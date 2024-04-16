@@ -8,16 +8,15 @@ const { Client } = pg;
 const client=new Client({
     host:"raja.db.elephantsql.com",
     user:"imbydddg",
-    port:5373,
     port:5174,
     password:"ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w",
     database:"imbydddg"
 });
-
+/*
 const app = express();
 const port = 5175;
-
-
+*/
+/*
 async function connectToDatabase() {
     try {
         // Connect to the PostgreSQL database
@@ -36,9 +35,9 @@ async function connectToDatabase() {
         console.log('Connection to PostgreSQL closed');
     }
 }
-
+*/
 // Call the function to connect to the database
-connectToDatabase();
+//connectToDatabase();
 
 // client.on('error', (err, client) => {
 //     console.error('Unexpected error on idle client', err);
@@ -61,6 +60,7 @@ connectToDatabase();
 
 
 // Middleware for parsing form data
+/*
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Handle form submission
@@ -92,7 +92,4 @@ app.post('/submit', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+*/

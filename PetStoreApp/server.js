@@ -17,69 +17,46 @@ app.use((req, res, next) => {
     next();
 });
 async function sqlSelect(query){
-    await pool.query(
-       query, (err,result)=>{
-            if (err) {
-              console.error('Error', err);
-              return -1;
-            } else {
-            //result is an arr or list of objs, each obj is a row
-                console.log(result);
-              return result;
-            }
-          }
-    );
+        return new Promise((resolve, reject) => {
+            pool.query(query, (err, result) => {
+                if (err) {
+                    console.error('Error', err);
+                    reject(err);
+                } else {
+                    resolve(result.rows);
+                }
+            });
+        });
 }
-
-async function sqlInsert(query){
-    await pool.query(
-        query,(err,results)=>{
-            if (err) {
-              console.error('Error', err);
-              return -1;
-            } else {
-            //result is an arr or list of objs, each obj is a row
-                console.log(result);
-              return 1;
-            }
-        }
-    )
-}
-
 async function sqlModify(query){
-    await pool.query(
-        query,(err,results)=>{
-            if (err) {
-              console.error('Error', err);
-              return -1;
-            } else {
-            //result is an arr or list of objs, each obj is a row
-                console.log(result);
-              return 1;
-            }
-        }
-    )
+        return new Promise((resolve, reject) => {
+            pool.query(query, (err, result) => {
+                if (err) {
+                    console.error('Error', err);
+                    reject(err);
+                } else {
+                    resolve(1);
+                }
+            });
+        });
 }
+
 app.listen(app.get('port'), () => {
   console.log("Express server listening on port " + app.get('port'));
 });
 
 
-app.post('/select', (req, res) => {
+app.post('/select', async (req, res) => {
   // Replace this with the actual data you want to send.
-  console.log("THIS IS REQ BODY");
-  const data = sqlSelect(req.body);
-  console.log(data);
-  res.send(data);
+  const data = await sqlSelect(req.body);
+  const values = data.map(row => Object.values(row));
+  console.log(JSON.stringify(data));
+  console.log(values);
+  res.send(values);
 });
-app.post('/insert', (req, res) => {
+app.post('/modify', async (req, res) => {//can just use this for insert,update,delete
   // Replace this with the actual data you want to send.
-  const data=sqlInsert(req.body);
-  res.send(data);
-});
-app.post('/modify', (req, res) => {//can just use this for insert,update,delete
-  // Replace this with the actual data you want to send.
-  const data=sqlModify(req.body);
+  const data=await sqlModify(req.body);
   res.send(data);
 });
 app.get('/', (req, res) => {
@@ -99,7 +76,6 @@ app.get('/users/dashboard', (req, res) => {
 });
 app.post('/users/register', async (req, res) => {
     let { name, email, password, password2 } = req.body;
-
     console.log({
         name, email, password, password2
     })
@@ -141,3 +117,4 @@ app.post('/users/register', async (req, res) => {
         // )
     }
 })
+console.log("E");

@@ -1,12 +1,118 @@
-import React from 'react';
+import React,{useState, useEffect} from 'react';
 import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
 import './App.css'
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { Link } from 'react-router-dom'
 
-
 function App() {
+const PORT= 5273;
+const [availableSpecies, setAvailableSpecies] = useState([]);
+const filterMap=new Map();
+const breedMap=new Map();//to make things a little less confusing
+/*
+filter map key_values
+Species->array of species to include, if empty, then include all
+*/
+const filterEnabled=false;
+async function sqlResults(sqlQuery) {
+    var url="http://"+ window.location.hostname + ":"+PORT +'/select';
+    //http://localhost:5173/
+    const response = await fetch(url, {
+        method:"POST",
+        headers: {
+              'Content-Type': 'text/plain'
+            },
+        body:sqlQuery
+    })
+    let results = await response.text();
+    return results;
+}
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openFilters = () => {
+    setIsOpen(!isOpen);
+  };
+  function updateAdoptionFilters(){
+      var cond="";
+      var speciesArr=filterMap.get('Species');
+      if (speciesArr.length>0){
+          var speciesList=arrToList(speciesArr);
+          cond=condBuilder(cond,`species IN ${speciesList}`)
+      }
+      //var breedArr=filterMap.get('Breed');
+      //var breedList=arrToList(breedArr);
+      var filterQuery="SELECT * FROM Pets";
+      if (cond!=""){
+          filterQuery='SELECT * FROM Pets where ' + cond;
+      }
+      console.log(filterQuery);
+      sqlResults(filterQuery).then(
+          results=>{
+              console.log(results);
+          }
+      );
+  }
+
+function setFilters(type,filterName){
+    if (filterMap.get(type).find((element) => element==filterName)){
+        index=filterMap.get(type).indexOf(filterName)
+        filterMap.get(type).splice(index, 1);
+    }
+    else{
+        filterMap.get(type).push(filterName);
+    }
+    if (type=="Species"){
+        //if ()
+    }
+    //then, show breeds based on species filter
+    //each species shoudl
+    updateAdoptionFilters();
+}
+
+function resetFilters(){
+    filterMap.clear();
+    updateAdoptionFilters();
+}
+
+
+
+
+  async function flattenArr(arrToConvert){
+    let result=[];
+    for (let i=0;i<arrToConvert.length;i++){
+        result.push(arrToConvert[i][0]);
+    }
+    return result;
+  }
+  async function getSpecies() {
+       if (availableSpecies.length === 0) {
+           var query = "SELECT sname FROM Species";
+           const results = await sqlResults(query);
+           const species = await flattenArr(JSON.parse(results));
+           setAvailableSpecies(species);
+           //for each species, load the breeds for each
+           for (let i=0;i<species.length;i++){
+            var breeds=await getBreeds(species[i]);
+            breedMap.(species[i],breeds);
+           }
+       }
+   };
+
+ async function getBreeds(speciesName) {
+    var query="SELECT Bname FROM Breed_Species_Relationship,Breed WHERE Breed_Species_Relationship.breedID = Breed.breedID AND Breed.Bname=" + speciesName;
+     var results = await sqlResults(query);
+     var breeds = await flattenArr(JSON.parse(results));
+     return breeds;
+ };
+ useEffect(() => {
+
+        getSpecies();
+    }, [availableSpecies, sqlResults]);
+
+    useEffect(() => {
+      getSpecies();
+    }, []);
   return (
     <div>
       <header data-bs-theme="dark">
@@ -96,6 +202,41 @@ function App() {
           </div>
         </div>
 
+            <div className="filter_parent" onClick={()=>openFilters()}>Filters
+
+                </div>
+                {isOpen && (            <div className="filter_body" id="filter_body">
+                                            <div className="filter_type hover_parent" id="filter_species">
+                                                Species
+                                                        <div id="species_child_container">
+                                                            {availableSpecies.map((species, i) => (
+                                                                <div key={i} onClick={() => setFilters('Species', species)}>
+                                                                    {species}
+                                                                        <div className="filter_type hover_parent" id="filter_breed">
+                                                                        Breeds
+                                                                            {speciesArray.map((item, index) => (
+                                                                             <div key={index} onClick={() => setFilters('Breeds', 'name')}>{item} </div>
+                                                                            ))}
+                                                                        </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                            </div>
+                                            <div className="filter_type hover_parent" id="filter_breed">
+                                                Breeds
+                                                <div className="hover_child_container" id="breed_child_container">
+
+                                                </div>
+                                            </div>
+                                            <div className="filter_type hover_parent" id="filter_age">
+                                                <div id="slider-vertical" style={{height: '200px'}}></div>
+                                            </div>
+                                        </div>
+                                    )}
+
+
+
+
         <div>
           {/* Start Featurettes */}
           <hr className="featurette-divider" />
@@ -143,7 +284,6 @@ function App() {
     </div>
   );
 }
-
 export default App;
 
 /* <form className="d-flex" role="search">
