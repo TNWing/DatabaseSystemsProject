@@ -56,7 +56,7 @@ CREATE TABLE Adopter (
 
 CREATE TABLE Staff (
     user_id INT PRIMARY KEY,
-    org_id INT,
+    org_id INT,``
     task VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES People(user_id),
     FOREIGN KEY (org_id) REFERENCES Organization(org_id)
