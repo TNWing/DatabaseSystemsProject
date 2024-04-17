@@ -122,7 +122,6 @@ async function checkIfUsernameExists(username) {
   }
 }
 
-
 app.get('/checkUsername/:username', async (req, res) => {
   try {
     const username = req.params.username;
@@ -133,5 +132,64 @@ app.get('/checkUsername/:username', async (req, res) => {
   } catch (error) {
     console.error('Error checking username:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/resources', async (req, res) => {
+  try {
+    // Query the database to fetch resources
+    const result = await pool.query('SELECT * FROM resources');
+    
+    // Extract the resources from the query result
+    const resources = result.rows;
+    console.log(resources)
+
+    // Send the resources as a JSON response
+    res.json({ resources });
+  } catch (error) {
+    // If an error occurs during the database query
+    console.error('Error fetching resources:', error);
+    // Send an error response to the client
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+async function deleteResourceFromDB(resourceId) {
+  // Define the SQL query to delete the resource
+  const query = 'DELETE FROM resources WHERE resourcenum = $1';
+  // Execute the query with the resource ID as a parameter
+  await pool.query(query, [resourceId]);
+}
+
+// Define route handler for deleting a resource
+app.delete('/resources/:id', async (req, res) => {
+  const resourceId = req.params.id;
+  try {
+    await deleteResourceFromDB(resourceId);
+    // Send success response
+    res.status(200).json({ success: true, message: `Resource with ID ${resourceId} deleted successfully` });
+  } catch (error) {
+    console.error('Error deleting resource:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete resource' });
+  }
+});
+
+app.put('/empDashboard/:id', async (req, res) => {
+  const resourceId = req.params.id;
+  const { url } = req.body;
+  console.log(resourceId)
+  console.log(url)
+
+  try {
+    // Update the resource URL in the database
+    const updateQuery = 'UPDATE resources SET resourceurl = $1 WHERE resourcenum = $2';
+    await pool.query(updateQuery, [url, resourceId]);
+
+    // Respond with success message
+    res.status(200).json({ success: true, message: 'Resource URL updated successfully' });
+  } catch (error) {
+    // Log and respond with error message
+    console.error('Error updating resource URL:', error);
+    res.status(500).json({ success: false, message: 'Failed to update resource URL' });
   }
 });

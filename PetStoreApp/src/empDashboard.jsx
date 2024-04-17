@@ -1,11 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Footer from './components/Footer'; // Import the Footer component
 import "./styles.css";
 import Navbar from './components/Navbar';
 
 function EmpDashboard() {
   const [insertFormVisible, setInsertFormVisible] = useState(false);
-  
+  const [resources, setResources] = useState([]);
+
+  useEffect(() => {
+    fetchResources();
+  }, []);
+
+  const fetchResources = async () => {
+    try {
+      const response = await fetch(`http://${window.location.hostname}:5273/resources`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch resources');
+      }
+      const data = await response.json();
+      setResources(data.resources);
+    } catch (error) {
+      console.error('Error fetching resources:', error.message);
+    }
+  };
+
   const openInsertForm = () => {
     setInsertFormVisible(true);
   };
@@ -14,20 +32,55 @@ function EmpDashboard() {
     setInsertFormVisible(false);
   };
 
-  const [resources, setResources] = useState([
-    { id: 1, name: "Resource 1", category: "Category A" },
-    { id: 2, name: "Resource 2", category: "Category B" },
-    { id: 3, name: "Resource 3", category: "Category C" },
-  ]);
-
-  const handleUpdate = (id) => {
-    // Handle update logic here
-    console.log(`Update resource with ID: ${id}`);
+  const handleUpdate = async (id, currentUrl) => {
+    try {
+      const updatedUrl = prompt('Enter the updated URL:', currentUrl);
+      if (!updatedUrl) {
+        // If the user cancels or does not provide a new URL, return without updating
+        return;
+      }
+      console.log(updatedUrl)
+      console.log(JSON.stringify({ url: updatedUrl }))
+      // Send a PUT request to update the resource URL
+      const response = await fetch(`http://${window.location.hostname}:5273/empDashboard/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: updatedUrl })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update resource URL');
+      }
+  
+      // If the update is successful, reload the page to reflect the changes
+      // window.location.reload();
+    } catch (error) {
+      console.error('Error updating resource URL:', error.message);
+      // Handle error - display an error message to the user or handle as needed
+    }
   };
+  
+  
 
-  const handleDelete = (id) => {
-    // Handle delete logic here
-    console.log(`Delete resource with ID: ${id}`);
+  const handleDelete = async (id) => {
+    try {
+      // Send DELETE request to server to delete the resource
+      const response = await fetch(`http://${window.location.hostname}:5273/resources/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete resource');
+      }
+      // If deletion successful, update local state by removing the deleted resource
+      setResources(resources.filter(resource => resource.id !== id));
+      window.location.reload();
+      console.log(`Resource with ID ${id} deleted successfully`);
+    } catch (error) {
+      console.error('Error deleting resource:', error.message);
+      // Handle error - display an error message to the user
+    }
   };
 
   return (
@@ -64,23 +117,24 @@ function EmpDashboard() {
         <table className="resource-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>Number</th>
               <th>URL</th>
-              <th>Organization</th>
+              {/* Need to join prov-resources with organization to obtain this */}
+              {/* <th>Organization</th> */} 
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {resources.map((resource) => (
-              <tr key={resource.id}>
-                <td>{resource.id}</td>
-                <td>{resource.name}</td>
-                <td>{resource.name}</td>
+              <tr key={resource.resourcenum}>
+                <td>{resource.resourcenum}</td>
+                <td>{resource.resourceurl}</td> {/* Adjust this according to your resource object structure */}
+                {/* <td>{resource.organization}</td> Adjust this according to your resource object structure */}
                 <td>
-                  <button className="btn-update" onClick={() => handleUpdate(resource.id)}>
+                  <button className="btn-update" onClick={() => handleUpdate(resource.resourcenum)}>
                     Update
                   </button>
-                  <button className="btn-delete" onClick={() => handleDelete(resource.id)}>
+                  <button className="btn-delete" onClick={() => handleDelete(resource.resourcenum)}>
                     Delete
                   </button>
                 </td>
@@ -90,17 +144,15 @@ function EmpDashboard() {
         </table>
       </div>
       
-
       {/* Other content */}
       <div className="section">
         <h3>Organization Name: Resources</h3>
         <div className="applications">
-          <h4><b>Resource 1</b></h4>
-          <h4><b>Resource 2</b></h4>
-          <h4><b>Resource 3</b></h4>
+          {resources.map((resource) => (
+            <h4 key={resource.resourcenum}><b>{resource.name}</b></h4>
+          ))}
         </div>
       </div>
-
 
       <Footer /> {/* Add the Footer component here */}
     </div>
