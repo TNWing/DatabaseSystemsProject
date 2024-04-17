@@ -196,7 +196,6 @@ app.put('/empDashboard/:id', async (req, res) => {
 
 app.post('/resources/insert', async (req, res) => {
   const { resourceNum, url } = req.body;
-  console.log(resourceNum)
   console.log(url)
   try {
     // Insert the resource into the database

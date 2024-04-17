@@ -55,8 +55,6 @@ function EmpDashboard() {
   };
   
   
-
-
   const handleUpdate = async (id, currentUrl) => {
     try {
       const updatedUrl = prompt('Enter the updated URL:', currentUrl);
@@ -116,7 +114,7 @@ function EmpDashboard() {
       </header>
 
       {/* Header */}
-      <div className="header">
+      <div className="header" style={{ marginTop: '50px' }}>
         <h1>Hello, Employee FName</h1>
       </div>
 
@@ -129,7 +127,7 @@ function EmpDashboard() {
       <div className={`form-popup ${insertFormVisible ? 'open' : ''}`} id="insertForm">
         <form className="form-container">
           <h2>Insert into resources:</h2>
-          <input type="text" id="resourceNum" name="resourceNum" placeholder="Resource Number" /><br /><br />
+          <input type="text" id="resourceNum" name="resourceNum" value={resourceNum} onChange={(e) => setResourceNum(e.target.value)} placeholder="Resource Number" /><br /><br />
           <input type="text" id="resource" name="resource" placeholder="Resource URL" /><br /><br />
           <button type="submit" className="button" onClick={handleInsert}>Submit</button>
           <button type="button" className="button cancel" onClick={closeInsertForm}>Close</button>

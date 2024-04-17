@@ -50,7 +50,7 @@ function UserDashboard() {
       </header>
 
       {/* Header */}
-      <div className="header">
+      <div className="header" style={{ marginTop: '50px' }}>
         <h1>Hello, fname</h1>
       </div>
 
