@@ -193,3 +193,21 @@ app.put('/empDashboard/:id', async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to update resource URL' });
   }
 });
+
+app.post('/resources/insert', async (req, res) => {
+  const { resourceNum, url } = req.body;
+  console.log(resourceNum)
+  console.log(url)
+  try {
+    // Insert the resource into the database
+    const insertQuery = 'INSERT INTO resources (resourcenum, resourceurl) VALUES ($1, $2)';
+    await pool.query(insertQuery, [resourceNum, url]);
+
+    // Respond with success message
+    res.status(200).json({ success: true, message: 'Resource inserted successfully' });
+  } catch (error) {
+    console.error('Error inserting resource:', error);
+    res.status(500).json({ success: false, message: 'Failed to insert resource' });
+  }
+});
+

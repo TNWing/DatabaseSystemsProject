@@ -6,6 +6,8 @@ import Navbar from './components/Navbar';
 function EmpDashboard() {
   const [insertFormVisible, setInsertFormVisible] = useState(false);
   const [resources, setResources] = useState([]);
+  const [resourceNum, setResourceNum] = useState("");
+
 
   useEffect(() => {
     fetchResources();
@@ -31,6 +33,29 @@ function EmpDashboard() {
   const closeInsertForm = () => {
     setInsertFormVisible(false);
   };
+
+  const handleInsert = async (resourceNum, url) => {
+    try {
+      const response = await fetch(`http://${window.location.hostname}:5273/resources/insert`, {
+        method: 'POST',
+        body: JSON.stringify({ resourceNum, url }),
+      });
+      console.log(JSON.stringify({ resourceNum, url }))
+  
+      if (!response.ok) {
+        throw new Error('Failed to insert resource');
+      }
+  
+      // If insertion is successful, reload the page to reflect the changes
+      // window.location.reload();
+    } catch (error) {
+      console.error('Error inserting resource:', error.message);
+      // Handle error - display an error message to the user or handle as needed
+    }
+  };
+  
+  
+
 
   const handleUpdate = async (id, currentUrl) => {
     try {
@@ -102,11 +127,11 @@ function EmpDashboard() {
 
       {/* Insert Form */}
       <div className={`form-popup ${insertFormVisible ? 'open' : ''}`} id="insertForm">
-        <form action="/action_page.php" className="form-container">
+        <form className="form-container">
           <h2>Insert into resources:</h2>
-          <label htmlFor="resource"><b>Resource URL:</b></label>
+          <input type="text" id="resourceNum" name="resourceNum" placeholder="Resource Number" /><br /><br />
           <input type="text" id="resource" name="resource" placeholder="Resource URL" /><br /><br />
-          <button type="submit" className="button">Submit</button>
+          <button type="submit" className="button" onClick={handleInsert}>Submit</button>
           <button type="button" className="button cancel" onClick={closeInsertForm}>Close</button>
         </form>
       </div>
