@@ -16,8 +16,8 @@ function Navbar() {
     setUsernameError("");
     setPasswordError("");
   };
-
-  const handleSubmit = (e) => {
+  const PORT = 5273;
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validate username
@@ -28,16 +28,31 @@ function Navbar() {
     }
 
     // Validate password
-    if (!password.trim()) {
-      setPasswordError("Please enter your password");
-    } else {
-      setPasswordError("");
-    }
+    // if (!password.trim()) {
+    //   setPasswordError("Please enter your password");
+    // } else {
+    //   setPasswordError("");
+    // }
 
-    // If both username and password are filled, proceed with form submission
-    if (username.trim() && password.trim()) {
-      // Perform further actions, sa submitting form data
-      console.log("Form submitted with username:", username, "and password:", password);
+    try {
+      const response = await fetch(`http://${window.location.hostname}:${PORT}/checkUsername/${username}`);
+      if (!response.ok) {
+        throw new Error('Failed to check username');
+      }
+      const data = await response.json();
+      if (data.exists) {
+        // Username exists
+        console.log('Username exists');
+        // Redirect to userDashboard
+        window.location.href = '/userDashboard';
+      } else {
+        // Username does not exist
+        console.log('Username does not exist');
+        // Proceed with login or display appropriate message
+      }
+    } catch (error) {
+      console.error('Error checking username:', error.message);
+      // Handle error - display an error message to the user
     }
   };
 
@@ -83,7 +98,7 @@ function Navbar() {
               />
               {usernameError && <div className="error-message">{usernameError}</div>}
             </div>
-            <div className="form-group">
+            {/* <div className="form-group">
               <input
                 type="password"
                 placeholder="Password"
@@ -91,7 +106,7 @@ function Navbar() {
                 onChange={(e) => setPassword(e.target.value)}
               />
               {passwordError && <div className="error-message">{passwordError}</div>}
-            </div>
+            </div> */}
             <button type="submit">Sign In</button>
             <div>
               <span style={{ color: 'white' }}>Not a member? </span>

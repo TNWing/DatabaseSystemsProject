@@ -28,7 +28,7 @@ function Main() {
           <Route path="/home" element={<Home email={email} loggedIn={loggedIn} />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/empDashboard" element={<EmpDashboard />} />
-          <Route path="/userDashboard" element={<UserDashboard />} />
+          <Route path="/userDashboard" element={<UserDashboard username={email} />} />
         </Routes>
       </BrowserRouter>
     </div>
@@ -40,12 +40,6 @@ export default Main;
 const rootElement = document.getElementById('root');
 
 ReactDOM.createRoot(rootElement).render(
-  <React.StrictMode>
-    <Main />
-  </React.StrictMode>
-);
-
-createRoot(rootElement).render(
   <React.StrictMode>
     <Main />
   </React.StrictMode>

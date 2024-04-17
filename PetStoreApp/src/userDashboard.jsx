@@ -1,3 +1,4 @@
+
 // Import React and other necessary modules
 import React, { useState, useEffect } from "react";
 import Footer from './components/Footer';
@@ -171,6 +172,25 @@ function UserDashboard() {
   const closeDonateForm = () => {
     setDonateFormVisible(false);
   };
+  // const [fname, setFname] = useState(""); // State to store the first name
+
+  // useEffect(() => {
+  //   // Fetch the first name associated with the signed-in username
+  //   const fetchFname = async () => {
+  //     try {
+  //       const response = await fetch(`http://${window.location.hostname}:5273/getFname/${username}`);
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch first name');
+  //       }
+  //       const data = await response.json();
+  //       setFname(data.fname);
+  //     } catch (error) {
+  //       console.error('Error fetching first name:', error.message);
+  //     }
+  //   };
+
+  //   fetchFname(); // Call the fetchFname function when the component mounts
+  // }, [username]);
 
   // Render the UI
   return (
