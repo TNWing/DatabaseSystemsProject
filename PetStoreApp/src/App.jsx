@@ -7,17 +7,67 @@ import { Link } from 'react-router-dom'
 
 function App() {
 const PORT= 5273;
+const [hasFetched, setHasFetched] = useState(false);
+const [isInit,setInit]=useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+const [petResult, setPets] = useState(null); // Initialize results with sqlResults()
 const [availableSpecies, setAvailableSpecies] = useState([]);
 const filterMap=new Map();
-const breedMap=new Map();//to make things a little less confusing
+const breedMap=new Map();//stores all breeds per species
+let isUserLoggedIn=false;
+ const [petElements, setPetElements] = useState(null);
+ useEffect(() => {
+     const fetchDataAndThenGetSpecies = async () => {
+        console.log("HERE");
+         await fetchData();
+         if (availableSpecies.length>0){
+             await getSpecies();
+         }
+     };
+
+     fetchDataAndThenGetSpecies();
+ }, []); // This effect runs once on mount
+
+ useEffect(() => {
+     if (availableSpecies.length>0) {
+       console.log("HERE" + availableSpecies + "PR");
+         getSpecies();
+     }
+ }, [availableSpecies]); // This effect runs when availableSpecies or sqlResults is updated
+useEffect(() => {
+    if (petResult) {
+
+        updatePets();
+    }
+}, [petResult]); // This effect runs when petResult is updated
+
+    async function fetchData() {
+        let queryResults=await sqlResults("SELECT * FROM Pets");
+        setPets(JSON.parse(queryResults))
+    }
+    async function updatePets(){
+
+        if (petResult){
+            const result = await processResults(petResult);
+                setPetElements(petResult);
+
+        }
+    }
+    if (!petElements) {
+        return <div>Loading...</div>; // Or some loading spinner
+    }
+
 /*
 filter map key_values
 Species->array of species to include, if empty, then include all
+Breeds->array of breeds to include. must use the breedMap to see if any breeds of that species is filtered
 */
+    let isLoggedIn=false;
 const filterEnabled=false;
 async function sqlResults(sqlQuery) {
     var url="http://"+ window.location.hostname + ":"+PORT +'/select';
     //http://localhost:5173/
+    console.log("FETCHING");
     const response = await fetch(url, {
         method:"POST",
         headers: {
@@ -28,30 +78,102 @@ async function sqlResults(sqlQuery) {
     let results = await response.text();
     return results;
 }
-  const [isOpen, setIsOpen] = useState(false);
+
 
   const openFilters = () => {
     setIsOpen(!isOpen);
   };
-  function updateAdoptionFilters(){
+  /*rework cond builder or just dont use it at all
+  function condBuilder(condString,strToAdd,operator="AND"){
+      console.log(strToAdd);
+      if (condString==""){
+          condString=strToAdd;
+      }
+      else{
+          condString+=" " + operator + " "+strToAdd;
+      }
+      console.log(condString);
+      return condString;
+  }
+  */
+  function arrToList(arr){
+      let list= arr.map(function (a) {
+          return "'" + a.replace("'", "''") + "'";
+      }).join(', ');
+      return "(" + list + ")";
+  }
+  function adoptAttempt(){
+    if (false){
+
+    }
+    else{
+
+    }
+  }
+
+  //processes the results from a query and makes new elements for each pet that was filtered
+async function processResults(results){
+    return new Promise((resolve, reject) => {
+        try {
+            let processedResults = results.map((result, index) => {
+                //TODO
+                return (
+                    <div key={index}>
+                        <img></img>
+                        <button disabled={isUserLoggedIn? false :true} onClick={()=>adoptAttempt()}>Adopt!</button>
+                    </div>
+                );
+            });
+            resolve(processedResults);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+  /*
+  CURRENTLY NO RELATION BTWN PET IMAGES AND PETS SO WILL ADD TO QUERIES LATER
+   PetImage_Belongs
+  */
+  async function updateAdoptionFilters(){
       var cond="";
       var speciesArr=filterMap.get('Species');
+      var conds=[];
+      var petArr=[];
       if (speciesArr.length>0){
-          var speciesList=arrToList(speciesArr);
-          cond=condBuilder(cond,`species IN ${speciesList}`)
-      }
-      //var breedArr=filterMap.get('Breed');
-      //var breedList=arrToList(breedArr);
-      var filterQuery="SELECT * FROM Pets";
-      if (cond!=""){
-          filterQuery='SELECT * FROM Pets where ' + cond;
-      }
-      console.log(filterQuery);
-      sqlResults(filterQuery).then(
-          results=>{
-              console.log(results);
+
+          for(let i=0;i<speciesArr;i++){
+            var breedArr=[];
+            let sB=breedMap.get(speciesArr[i]);
+            if (sB.length>0){
+                let noBreedRestrict=true;
+                for (let b=0;b<sB.length;b++){
+                    var bool=filterMap.get('Breeds').includes(sB[b]);
+                    if(bool){
+                        noBreedRestrict=false;
+                        breedArr.push(sB[b]);
+                    }
+                }
+                var query="";
+                if (noBreedRestrict){
+                    query="SELECT * FROM Pets WHERE species =" + speciesArr[i];
+                }
+                else{
+                    query="  SELECT * FROM Pets "
+                    +"INNER JOIN Is_Breed_Type ON Pets.petID=Is_Breed_Type.petID INNER JOIN Breed ON Is_Breed_Type.breedID = Breed.breedID"
+                    +"where Bname IN " + arrToList(breedArr);
+                }
+                await sqlResults(filterQuery).then(results=>{console.log(results);});
+            }
+            else{
+                var query="SELECT * FROM Pets WHERE species =" + speciesArr[i];
+                await sqlResults(filterQuery).then(results=>{console.log(results);});
+                //may need to flatten/iterate thr the results to append to my petArr
+            }
+
           }
-      );
+
+      }
+      processResults(petArr);
   }
 
 function setFilters(type,filterName){
@@ -67,12 +189,12 @@ function setFilters(type,filterName){
     }
     //then, show breeds based on species filter
     //each species shoudl
-    updateAdoptionFilters();
+    //updateAdoptionFilters();
 }
 
 function resetFilters(){
     filterMap.clear();
-    updateAdoptionFilters();
+    //updateAdoptionFilters();
 }
 
 
@@ -94,25 +216,19 @@ function resetFilters(){
            //for each species, load the breeds for each
            for (let i=0;i<species.length;i++){
             var breeds=await getBreeds(species[i]);
-            breedMap.(species[i],breeds);
+            breedMap.set(species[i],breeds);
            }
        }
    };
 
  async function getBreeds(speciesName) {
-    var query="SELECT Bname FROM Breed_Species_Relationship,Breed WHERE Breed_Species_Relationship.breedID = Breed.breedID AND Breed.Bname=" + speciesName;
+    var query=`SELECT Bname FROM Breed_Species_Relationship,Breed WHERE Breed_Species_Relationship.breedID = Breed.breedID AND Breed.Bname=${speciesName}`;
      var results = await sqlResults(query);
      var breeds = await flattenArr(JSON.parse(results));
      return breeds;
  };
- useEffect(() => {
 
-        getSpecies();
-    }, [availableSpecies, sqlResults]);
 
-    useEffect(() => {
-      getSpecies();
-    }, []);
   return (
     <div>
       <header data-bs-theme="dark">
@@ -205,7 +321,7 @@ function resetFilters(){
             <div className="filter_parent" onClick={()=>openFilters()}>Filters
 
                 </div>
-                {isOpen && (            <div className="filter_body" id="filter_body">
+                {isOpen && (<div className="filter_body" id="filter_body">
                                             <div className="filter_type hover_parent" id="filter_species">
                                                 Species
                                                         <div id="species_child_container">
@@ -235,7 +351,9 @@ function resetFilters(){
                                     )}
 
 
-
+<div id="petsToShow">
+{petElements}
+</div>
 
         <div>
           {/* Start Featurettes */}
