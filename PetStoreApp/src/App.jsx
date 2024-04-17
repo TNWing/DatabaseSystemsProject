@@ -18,7 +18,6 @@ let isUserLoggedIn=false;
  const [petElements, setPetElements] = useState(null);
  useEffect(() => {
      const fetchDataAndThenGetSpecies = async () => {
-        console.log("HERE");
          await fetchData();
          if (availableSpecies.length>0){
              await getSpecies();
@@ -43,14 +42,15 @@ useEffect(() => {
 
     async function fetchData() {
         let queryResults=await sqlResults("SELECT * FROM Pets");
+        console.log(JSON.parse(queryResults));
         setPets(JSON.parse(queryResults))
     }
     async function updatePets(){
 
         if (petResult){
-
+            console.log(petResult);
             const result = await processResults(petResult);
-                setPetElements(petResult);
+                setPetElements(result);
 
         }
     }
@@ -103,15 +103,14 @@ async function sqlResults(sqlQuery) {
 async function processResults(results){
     return new Promise((resolve, reject) => {
         try {
-            console.log("OUR RES" + results);
+        console.log(results);
             let processedResults = results.map((result, index) => {
                 //TODO
+                console.log(result);
                 return (
-                    <div key={index}>
+                    <div key={index}>{result[1]}
                         <img></img>
                         <button disabled={isUserLoggedIn? false :true} onClick={()=>adoptAttempt()}>Adopt!</button>
-                        <br />
-                        <br />
                         <br />
                     </div>
 
