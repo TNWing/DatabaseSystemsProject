@@ -117,4 +117,3 @@ app.post('/users/register', async (req, res) => {
         // )
     }
 })
-console.log("E");
