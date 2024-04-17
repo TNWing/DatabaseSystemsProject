@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './index.css';
 import Navbar from './components/Navbar';
-import axios from 'axios';
 
 const Register = (props) => {
   const [email, setEmail] = useState('');
@@ -10,7 +9,7 @@ const Register = (props) => {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [fname, setFname] = useState('');
   const [lname, setLname] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phonenumber, setPhone] = useState('');
   const [address, setAddress] = useState('');
   
   const [emailError, setEmailError] = useState('');
@@ -23,6 +22,13 @@ const Register = (props) => {
   
   const navigate = useNavigate();
 
+  const PORT = 5273;
+
+  function generateUserID() {
+    const userID = Math.floor(100000000 + Math.random() * 900000000).toString().substring(0, 9);
+    return userID;
+  }
+
   const handleSubmit = async () => {
     // Set initial error values to empty
     setEmailError('');
@@ -32,6 +38,7 @@ const Register = (props) => {
     setPhoneError('');
     setAddressError('');
     setPasswordConfirmError('');
+    const userID = generateUserID();
 
     // Check if the user has entered all fields correctly
     if (!fname) {
@@ -44,7 +51,7 @@ const Register = (props) => {
       return;
     }
 
-    if (!phone) {
+    if (!phonenumber) {
       setPhoneError('Please enter your Phone Number');
       return;
     }
@@ -69,7 +76,7 @@ const Register = (props) => {
       return;
     }
 
-    if (phone.length !== 10) {
+    if (phonenumber.length !== 10) {
       setPhoneError('Please enter a valid 10-digit Phone Number');
       return;
     }
@@ -84,21 +91,32 @@ const Register = (props) => {
       return;
     }
 
-    // If all validations pass, proceed with form submission
+    const requestBody = {
+      userID,
+      email,
+      fname,
+      lname,
+      phonenumber,
+      address,
+    };
+    console.log(requestBody)
+    console.log(JSON.stringify(requestBody))
     try {
-      // Send POST request to /register endpoint
-      const response = await axios.post(
-        "http://" + window.location.hostname + ":"+PORT +'/register',{
-        email,
-        fname,
-        lname,
-        phonenumber,
-        address,
+      const responseRegister = await fetch(`http://${window.location.hostname}:${PORT}/register`, {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
       });
 
+      console.log(responseRegister)
+
+      if (!responseRegister.ok) {
+        throw new Error('Registration failed');
+      }
+
       // Handle successful registration response
-      console.log(response.data); // Log success message
-      navigate('/success'); // Navigate to success page or handle as needed
+      console.log("Registration successful");
+      navigate('/userDashboard'); 
+      
     } catch (error) {
       // Handle registration error
       console.error('Error registering user:', error);
@@ -134,7 +152,7 @@ const Register = (props) => {
         <br />
         <div className={'inputContainer'}>
             <input
-            value={phone}
+            value={phonenumber}
             placeholder="Enter your Phone Number here (only numbers)"
             onChange={(ev) => setPhone(ev.target.value)}
             className={'inputBox'}

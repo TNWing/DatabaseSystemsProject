@@ -17,18 +17,16 @@ app.use((req, res, next) => {
     next();
 });
 async function sqlSelect(query){
-    await pool.query(
-       query, (err,result)=>{
-            if (err) {
+  return new Promise((resolve, reject) => {
+      pool.query(query, (err, result) => {
+          if (err) {
               console.error('Error', err);
-              return -1;
-            } else {
-            //result is an arr or list of objs, each obj is a row
-                console.log(result);
-              return result;
-            }
+              reject(err);
+          } else {
+              resolve(result.rows);
           }
-    );
+      });
+  });
 }
 
 async function sqlInsert(query){
@@ -46,37 +44,32 @@ async function sqlInsert(query){
     )
 }
 
-async function sqlModify(query){
-    await pool.query(
-        query,(err,results)=>{
-            if (err) {
-              console.error('Error', err);
-              return -1;
-            } else {
-            //result is an arr or list of objs, each obj is a row
-                console.log(result);
-              return 1;
-            }
-        }
-    )
-}
 app.listen(app.get('port'), () => {
   console.log("Express server listening on port " + app.get('port'));
 });
 
 
-app.post('/select', (req, res) => {
+app.post('/select', async (req, res) => {
   // Replace this with the actual data you want to send.
-  console.log("THIS IS REQ BODY");
-  const data = sqlSelect(req.body);
-  console.log(data);
-  res.send(data);
+  const data = await sqlSelect(req.body);
+  const values = data.map(row => Object.values(row));
+  console.log(JSON.stringify(data));
+  console.log(values);
+  res.send(values);
 });
-app.post('/insert', (req, res) => {
-  // Replace this with the actual data you want to send.
-  const data=sqlInsert(req.body);
-  res.send(data);
-});
+
+async function sqlModify(query){
+  return new Promise((resolve, reject) => {
+      pool.query(query, (err, result) => {
+          if (err) {
+              console.error('Error', err);
+              reject(err);
+          } else {
+              resolve(1);
+          }
+      });
+  });
+}
 app.post('/modify', (req, res) => {//can just use this for insert,update,delete
   // Replace this with the actual data you want to send.
   const data=sqlModify(req.body);
@@ -86,58 +79,59 @@ app.get('/', (req, res) => {
     res.render('index')
 });
 
-app.get('/users/register', (req, res) => {
-    res.render('register')
+app.post('/register', async (req, res) => {
+  try {
+    // Parse the JSON data from the request body
+    const registerData = JSON.parse(req.body);
+    console.log(registerData);
+
+    // Extract user registration data from the parsed JSON object
+    const { userID, email, fname, lname, phonenumber, address } = registerData;
+    const values = [userID, email, fname, lname, phonenumber, address];
+    console.log(values);
+
+    // Perform any necessary data validation here
+
+    // Insert the user data into the database
+    const query = `
+      INSERT INTO users (userID, email, fname, lname, phonenumber, address)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `;
+    await pool.query(query, values);
+
+    // Send success response
+    res.status(200).json({ success: true, message: 'User registered successfully' });
+  } catch (error) {
+    // If registration fails
+    console.error('Error registering user:', error);
+    res.status(500).json({ success: false, message: 'Registration failed' });
+  }
 });
 
-app.get('/users/login', (req, res) => {
-    res.render('login')
+async function checkIfUsernameExists(username) {
+  try {
+    // Query the database to check if the username exists
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [username]);
+    // If a row with the given username exists, return true; otherwise, return false
+    return result.rows.length > 0;
+  } catch (error) {
+    // Log any errors that occur during the database query
+    console.error('Error checking if username exists:', error);
+    // Return false in case of an error or if the query fails
+    return false;
+  }
+}
+
+
+app.get('/checkUsername/:username', async (req, res) => {
+  try {
+    const username = req.params.username;
+    // Query the database to check if the username exists
+    const userExists = await checkIfUsernameExists(username);
+    // Send JSON response based on whether the username exists or not
+    res.json({ exists: userExists });
+  } catch (error) {
+    console.error('Error checking username:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
-
-app.get('/users/dashboard', (req, res) => {
-    res.render('dashboard', {user: "Dante"})
-});
-app.post('/users/register', async (req, res) => {
-    let { name, email, password, password2 } = req.body;
-
-    console.log({
-        name, email, password, password2
-    })
-
-    let errors = [];
-
-    if (!name ||!email ||!password ||!password2) {
-        errors.push({message: "Please fill all fields"});
-    }
-
-    if (password.length < 6) {
-        errors.push({message: "Your password must be longer than 6 characters"});
-    }
-
-    if (password != password2) {
-        errors.push({message: "Passwords do not match"});
-    }
-
-    if(errors.length > 0) {
-        res.render("register", {errors})
-    } else {
-        // Form validation passed
-        let hashedPassword = await bcrypt.hash(password, 10);
-        console.log(hashedPassword);
-
-        // pool.query(
-        //     `SELECT * FROM users WHERE email = $1`,
-        //     [email],
-        //     (err, results) => {
-        //         if (err) {
-        //             throw err;
-        //         }
-        //         console.log(results.rows);
-        //         if (results.rows.length > 0){
-        //             errors.push({ message: "Email already registered"});
-        //             res.render('register', { errors })
-        //         }
-        //     }
-        // )
-    }
-})
