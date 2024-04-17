@@ -48,6 +48,7 @@ useEffect(() => {
     async function updatePets(){
 
         if (petResult){
+
             const result = await processResults(petResult);
                 setPetElements(petResult);
 
@@ -83,19 +84,6 @@ async function sqlResults(sqlQuery) {
   const openFilters = () => {
     setIsOpen(!isOpen);
   };
-  /*rework cond builder or just dont use it at all
-  function condBuilder(condString,strToAdd,operator="AND"){
-      console.log(strToAdd);
-      if (condString==""){
-          condString=strToAdd;
-      }
-      else{
-          condString+=" " + operator + " "+strToAdd;
-      }
-      console.log(condString);
-      return condString;
-  }
-  */
   function arrToList(arr){
       let list= arr.map(function (a) {
           return "'" + a.replace("'", "''") + "'";
@@ -115,13 +103,18 @@ async function sqlResults(sqlQuery) {
 async function processResults(results){
     return new Promise((resolve, reject) => {
         try {
+            console.log("OUR RES" + results);
             let processedResults = results.map((result, index) => {
                 //TODO
                 return (
                     <div key={index}>
                         <img></img>
                         <button disabled={isUserLoggedIn? false :true} onClick={()=>adoptAttempt()}>Adopt!</button>
+                        <br />
+                        <br />
+                        <br />
                     </div>
+
                 );
             });
             resolve(processedResults);
@@ -322,7 +315,7 @@ function resetFilters(){
 
                 </div>
                 {isOpen && (<div className="filter_body" id="filter_body">
-                                            <div className="filter_type hover_parent" id="filter_species">
+                                            <div className="hover_parent" id="filter_species">
                                                 Species
                                                         <div id="species_child_container">
                                                             {availableSpecies.map((species, i) => (
@@ -338,13 +331,13 @@ function resetFilters(){
                                                             ))}
                                                         </div>
                                             </div>
-                                            <div className="filter_type hover_parent" id="filter_breed">
+                                            <div className="hover_parent" id="filter_breed">
                                                 Breeds
                                                 <div className="hover_child_container" id="breed_child_container">
 
                                                 </div>
                                             </div>
-                                            <div className="filter_type hover_parent" id="filter_age">
+                                            <div className="hover_parent" id="filter_age">
                                                 <div id="slider-vertical" style={{height: '200px'}}></div>
                                             </div>
                                         </div>
