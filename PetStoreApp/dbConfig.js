@@ -7,7 +7,7 @@ const connectionString = `postgressql://${process.env.DB_USER}:${process.env.DB_
 
 const pool = new Pool({
     //connectionString: isProduction ? process.env.DB_DATABASE_URL : connectionString
-    idleTimeoutMillis: 0,
+    idleTimeoutMillis: 5000,
     connectionString: 'postgres://imbydddg:ePk7Zq0YXRLl2cqqBVceOkPYnQgXaO5w@raja.db.elephantsql.com/imbydddg'
 });
 
