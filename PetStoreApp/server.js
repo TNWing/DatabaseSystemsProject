@@ -70,27 +70,16 @@ app.post('/select', async (req, res) => {
   console.log(values);
   res.send(values);
 });
-app.post('/insert', (req, res) => {
-  // Replace this with the actual data you want to send.
-  const data = await sqlSelect(req.body);
-  const values = data.map(row => Object.values(row));
-  console.log(JSON.stringify(data));
-  console.log(values);
-  res.send(values);
-});
+// app.post('/insert', (req, res) => {
+//   // Replace this with the actual data you want to send.
+//   const data = await sqlSelect(req.body);
+//   const values = data.map(row => Object.values(row));
+//   console.log(JSON.stringify(data));
+//   console.log(values);
+//   res.send(values);
+// });
 
-async function sqlModify(query){
-  return new Promise((resolve, reject) => {
-      pool.query(query, (err, result) => {
-          if (err) {
-              console.error('Error', err);
-              reject(err);
-          } else {
-              resolve(1);
-          }
-      });
-  });
-}
+
 app.post('/modify', (req, res) => {//can just use this for insert,update,delete
   // Replace this with the actual data you want to send.
   const data=sqlModify(req.body);

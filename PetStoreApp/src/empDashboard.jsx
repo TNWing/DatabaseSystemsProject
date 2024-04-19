@@ -166,16 +166,6 @@ function EmpDashboard() {
           </tbody>
         </table>
       </div>
-      
-      {/* Other content */}
-      <div className="section">
-        <h3>Organization Name: Resources</h3>
-        <div className="applications">
-          {resources.map((resource) => (
-            <h4 key={resource.resourcenum}><b>{resource.name}</b></h4>
-          ))}
-        </div>
-      </div>
 
       <Footer /> {/* Add the Footer component here */}
     </div>
