@@ -3,7 +3,7 @@ import './databasepg.js'
 import { pool } from './dbConfig.js'
 import express from 'express';
 import cors from 'cors'
-const session = require('express-session');
+import session from 'express-session';
 const app = express();
 import bcrypt from 'bcrypt';
 const PORT = 5273;

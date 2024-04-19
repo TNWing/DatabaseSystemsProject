@@ -336,6 +336,7 @@ function resetFilters(){
                                                         </div>
                                             </div>
                                             <div className="hover_parent" id="filter_age">
+                                                Age
                                                 <div id="slider-vertical" style={{height: '200px'}}></div>
                                             </div>
                                         </div>
