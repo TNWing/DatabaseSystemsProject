@@ -309,7 +309,6 @@ app.get('/organizations', async (req, res) => {
 app.post('/donate', async (req, res) => {
   // Extract data from the request body
   const { organization, amount, userid } = req.body;
-console.log("TEST");
   try {
       // Fetch the orgid based on the selected organization name
       const orgResult = await pool.query(

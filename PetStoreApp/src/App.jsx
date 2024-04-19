@@ -324,7 +324,7 @@ function resetFilters(){
                                                                         Breeds
                                                                              {breedMap.has(species) &&breedMap.get(species).map((item, index) => (
                                                                                                 <React.Fragment key={index}>
-                                                                                                    <div onClick={() => setFilters('Breeds', 'name')}>
+                                                                                                    <div onClick={() => setFilters('Breeds', {item})}>
                                                                                                         {item}
                                                                                                     </div>
                                                                                                     <br/>
@@ -334,12 +334,6 @@ function resetFilters(){
                                                                 </div>
                                                             ))}
                                                         </div>
-                                            </div>
-                                            <div className="hover_parent" id="filter_breed">
-                                                Breeds
-                                                <div className="hover_child_container" id="breed_child_container">
-
-                                                </div>
                                             </div>
                                             <div className="hover_parent" id="filter_age">
                                                 <div id="slider-vertical" style={{height: '200px'}}></div>
