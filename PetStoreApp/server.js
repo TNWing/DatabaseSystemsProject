@@ -3,7 +3,7 @@ import './databasepg.js'
 import { pool } from './dbConfig.js'
 import express from 'express';
 import cors from 'cors'
-
+const session = require('express-session');
 const app = express();
 import bcrypt from 'bcrypt';
 const PORT = 5273;
@@ -16,6 +16,12 @@ app.use((req, res, next) => {
     res.header('Content-Type', 'text/plain');
     next();
 });
+app.use(session({
+    secret: 'Oo6iCFWGj7Ip3GAjphCa2FFkm',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}));
 async function sqlSelect(query){
         return new Promise((resolve, reject) => {
             pool.query(query, (err, result) => {
