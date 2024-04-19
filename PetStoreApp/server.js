@@ -93,7 +93,11 @@ app.post('/select', async (req, res) => {
   console.log(values);
   res.send(values);
 });
-
+/*
+    req.session.user={
+        username:userDetails.Username
+    }
+*/
 app.post('/modify', async (req, res) => {//can just use this for insert,update,delete
   // Replace this with the actual data you want to send.
   const data=await sqlModify(req.body);
@@ -103,6 +107,25 @@ app.get('/', (req, res) => {
     res.render('index')
 });
 
+/*anytime the server receives a request from the user
+the server can use req.session.user to get the user session id (this can be anything we want like email or the actual userID
+and we can wrap actions only for logged in users in:
+if (req.session.user){};
+
+
+*/
+app.post('/login', async (req, res) => {
+  let userDetails=JSON.parse(req.body);
+  let result=0;//TODO: check and verify user
+  if (result){
+    req.session.user={
+        userID:"TODO",
+    }
+  }
+  else{
+    res.send(403,"Invalid Login!");
+  }
+}
 app.post('/register', async (req, res) => {
   try {
     // Parse the JSON data from the request body
