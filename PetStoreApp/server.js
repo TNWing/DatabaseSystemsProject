@@ -70,6 +70,7 @@ app.post('/select', async (req, res) => {
   console.log(values);
   res.send(values);
 });
+
 // app.post('/insert', (req, res) => {
 //   // Replace this with the actual data you want to send.
 //   const data = await sqlSelect(req.body);
@@ -80,9 +81,9 @@ app.post('/select', async (req, res) => {
 // });
 
 
-app.post('/modify', (req, res) => {//can just use this for insert,update,delete
+app.post('/modify', async(req, res) => {//can just use this for insert,update,delete
   // Replace this with the actual data you want to send.
-  const data=sqlModify(req.body);
+  const data=await sqlModify(req.body);
   res.send(data);
 });
 app.get('/', (req, res) => {
