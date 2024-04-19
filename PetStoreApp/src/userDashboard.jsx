@@ -1,38 +1,209 @@
-import React, { useState } from "react";
-import Footer from './components/Footer'; // Import the Footer component
-import "./styles.css";
+
+// Import React and other necessary modules
+import React, { useState, useEffect } from "react";
+import Footer from './components/Footer';
 import Navbar from './components/Navbar';
 
+// Define the UserDashboard component
 function UserDashboard() {
+  // Define states for various data
   const [volunteerFormVisible, setVolunteerFormVisible] = useState(false);
   const [donateFormVisible, setDonateFormVisible] = useState(false);
+  const [organizations, setOrganizations] = useState([]);
+  const [petNames, setPetNames] = useState([]);
+  const [petApplication, setPetApplication] = useState(null);
+  const [userName, setUserName] = useState('');
+  const [userDonations, setUserDonations] = useState([]);
 
+  // Define function to handle donation submission
+  const handleDonationSubmit = async (event) => {
+    event.preventDefault();
+
+    // Extract data from the form
+    const organization = event.target.organization.value;
+    const amount = event.target.amount.value;
+
+    try {
+        // Send donation data to the server
+        const response = await fetch('http://localhost:5273/donate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ organization, amount })
+        });
+
+        // Check if the donation was successfully submitted
+        if (response.ok) {
+            // Handle success, e.g., show a success message
+            console.log('Donation submitted successfully');
+            // Fetch pet application and donations again to update the data
+            fetchPetApplication();
+            fetchUserDonations(); // Update user donations after submission
+        } else {
+            // Handle errors, e.g., show an error message
+            console.error('Error submitting donation:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error submitting donation:', error);
+    }
+  };
+
+  // Define function to fetch data from the server
+  const fetchData = async() => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await fetchOrganizations();
+        await fetchPets();
+        await fetchPetApplication();
+        await fetchUserDetails();
+        await fetchUserDonations();
+        resolve(); 
+      } catch (error) {
+        reject(error); 
+      }
+    });
+  };
+
+  // UseEffect hook to fetch data when the component mounts
+  useEffect(() => {
+    fetchData()
+      .then(() => {
+        console.log('Data fetching completed successfully');
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
+//test cp,,m
+  // Function to fetch organizations from the server
+  const fetchOrganizations = async() => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const PORT = 5273;
+        const response = await fetch(`http://${window.location.hostname}:${PORT}/organizations`);
+        const data = await response.json();
+        setOrganizations(data.organizations);
+        resolve();
+      } catch (error) {
+        console.error('Error fetching organizations', error);
+        reject(error); 
+      }
+    });
+  };
+
+  // Function to fetch pets from the server
+  const fetchPets = async() => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await fetch('http://localhost:5273/pets');
+        const data = await response.json();
+        setPetNames(data.petNames);
+        resolve(); 
+      } catch (error) {
+        console.error('Error fetching pets', error);
+        reject(error); 
+      }
+    });
+  };
+
+  // Function to fetch pet application from the server
+  const fetchPetApplication = async() => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await fetch('http://localhost:5273/adopt/user001');
+        const data = await response.json();
+        setPetApplication(data);
+        resolve(); 
+      } catch (error) {
+        console.error('Error fetching pet application', error);
+        reject(error); 
+      }
+    });
+  };
+
+  // Function to fetch user details from the server
+  const fetchUserDetails =async () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await fetch('http://localhost:5273/users/user001'); 
+        const data = await response.json();
+        const fullName = `${data.fname} ${data.lname}`; 
+        setUserName(fullName);
+        resolve(); 
+      } catch (error) {
+        console.error('Error fetching user details', error);
+        reject(error); 
+      }
+    });
+  };
+
+  // Function to fetch user donations from the server
+  const fetchUserDonations = async() => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await fetch('http://localhost:5273/donations/user001');
+        const data = await response.json();
+        setUserDonations(data.donations);
+        resolve(); 
+      } catch (error) {
+        console.error('Error fetching user donations', error);
+        reject(error); 
+      }
+    });
+  };
+
+  // Function to open the volunteer form
   const openVolunteerForm = () => {
     setVolunteerFormVisible(true);
   };
 
+  // Function to close the volunteer form
   const closeVolunteerForm = () => {
     setVolunteerFormVisible(false);
   };
 
+  // Function to open the donate form
   const openDonateForm = () => {
     setDonateFormVisible(true);
   };
 
+  // Function to close the donate form
   const closeDonateForm = () => {
     setDonateFormVisible(false);
   };
+  // const [fname, setFname] = useState(""); // State to store the first name
 
+  // useEffect(() => {
+  //   // Fetch the first name associated with the signed-in username
+  //   const fetchFname = async () => {
+  //     try {
+  //       const response = await fetch(`http://${window.location.hostname}:5273/getFname/${username}`);
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch first name');
+  //       }
+  //       const data = await response.json();
+  //       setFname(data.fname);
+  //     } catch (error) {
+  //       console.error('Error fetching first name:', error.message);
+  //     }
+  //   };
+
+  //   fetchFname(); // Call the fetchFname function when the component mounts
+  // }, [username]);
+
+  // Render the UI
   return (
     <div className="container">
 
+      {/* Navbar */}
       <header data-bs-theme="dark">
         <Navbar/>
       </header>
 
       {/* Header */}
       <div className="header">
-        <h1>Hello, User FName</h1>
+        <h1>Hello, {userName}</h1>
       </div>
 
       {/* Volunteer and Donate buttons */}
@@ -47,10 +218,9 @@ function UserDashboard() {
           <h2>Volunteer</h2>
           <label htmlFor="organization"><b>Organization:</b></label>
           <select name="organization" id="organization">
-            <option value="Org1">Org1</option>
-            <option value="Org2">Org2</option>
-            <option value="Org3">Org3</option>
-            <option value="Org4">Org4</option>
+            {organizations.map(org => (
+              <option key={org} value={org}>{org}</option>
+            ))}
           </select>
           <br /><br />
           <label htmlFor="task"><b>Task:</b></label>
@@ -72,46 +242,49 @@ function UserDashboard() {
           <h2>Donate</h2>
           <label htmlFor="organization"><b>Organization:</b></label>
           <select name="organization" id="organization">
-            <option value="Org1">Org1</option>
-            <option value="Org2">Org2</option>
-            <option value="Org3">Org3</option>
-            <option value="Org4">Org4</option>
+            {organizations.map(org => (
+              <option key={org} value={org}>{org}</option>
+            ))}
           </select>
           <br /><br />
           <label htmlFor="amount"><b>Amount:</b></label>
           <input type="text" id="amount" name="amount" placeholder="$0.00" /><br /><br />
-          <button type="submit" className="button">Submit</button>
+          <button type="submit" className="button" onClick={handleDonationSubmit}>Submit</button>
           <button type="button" className="button cancel" onClick={closeDonateForm}>Close</button>
         </form>
       </div>
 
-      {/* Other content */}
+      {/* Display Pet Application and User Donations */}
       <div className="section">
-        <h3>My Applications</h3>
-        <div className="applications">
-          <h4><b>App ID 1, PName</b></h4>
-          <h4><b>App ID 2, PName</b></h4>
-          <h4><b>App ID 3, PName</b></h4>
-        </div>
+        <h3>Pet Applications</h3>
+        {petApplication ? (
+          <div>
+            <p>User Name: {userName}</p> 
+            <p>Pet Name: {petApplication.pname}</p>
+          </div>
+        ) : (
+          <p>No pet application found for user001</p>
+        )}
+
+        <h3>Donations</h3>
+        {userDonations.map((donation, index) => (
+          <div key={index}>
+            <p>Organization: {donation.organization}</p> 
+            <p>Amount: ${donation.amount}</p>
+          </div>
+        ))}
       </div>
 
       {/* Pet Section */}
       <div className="section">
         <h2>Pets to Adopt!</h2>
         <div className="pet-container">
-          <div className="pet-card">
-            <img src="PetStoreApp\src\images\petImage1.jpg" alt="Pet1" />
-            <h3>Pet 1</h3>
-          </div>
-          <div className="pet-card">
-            <img src="PetStoreApp\src\images\petImage1.jpg" alt="Pet2" />
-            <h3>Pet 2</h3>
-          </div>
-          <div className="pet-card">
-            <img src="PetStoreApp\src\images\petImage1.jpg" alt="Pet3" />
-            <h3>Pet 3</h3>
-          </div>
-          {/* Add more pet cards here */}
+          {petNames.map((petName, index) => (
+            <div className="pet-card" key={index}>
+              <img src={`https://static.vecteezy.com/system/resources/thumbnails/005/857/332/small_2x/funny-portrait-of-cute-corgi-dog-outdoors-free-photo.jpg`} alt={petName} />
+              <h3>{petName}</h3>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -130,4 +303,5 @@ function UserDashboard() {
   );
 }
 
+// Export the UserDashboard component
 export default UserDashboard;
