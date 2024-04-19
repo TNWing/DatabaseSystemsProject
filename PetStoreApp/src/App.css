@@ -130,7 +130,6 @@ body {
           font-size: 15px;
   	}
   	.filter_body{
-          display: none;
           overflow: hidden;
           background-color:#b0b0b0;
           padding:25px;
@@ -148,6 +147,15 @@ body {
     		vertical-align:middle;
     		font-family: "Madimi One", sans-serif;
   	}
+  	  	.hover_parent2{
+      	    color:green;
+      		font-size:90%;
+      		padding-left: 10px;
+      		text-decoration: none;
+      	  	display:inline-block;
+        		vertical-align:middle;
+        		font-family: "Madimi One", sans-serif;
+      	}
   	.hover_child_container{
   		  display: none;
   	  position: absolute;
@@ -160,11 +168,16 @@ body {
   	.filter_option{
 
   	}
-  .hover_parent:hover
-   {
-   .hover_child_container {display: block;}
+.hover_parent:hover
+ {
+ .hover_child_container {display: block;}
 
-   }
+ }
+ .hover_parent2:hover
+  {
+  .hover_child_container {display: block;}
+
+  }
   /* rtl:end:remove */
   
   /* RESPONSIVE CSS

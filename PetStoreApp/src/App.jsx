@@ -10,6 +10,7 @@ const PORT= 5273;
 const [hasFetched, setHasFetched] = useState(false);
 const [isInit,setInit]=useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
 const [petResult, setPets] = useState(null); // Initialize results with sqlResults()
 const [availableSpecies, setAvailableSpecies] = useState([]);
 const filterMap=new Map();
@@ -19,20 +20,20 @@ let isUserLoggedIn=false;
  useEffect(() => {
      const fetchDataAndThenGetSpecies = async () => {
          await fetchData();
+         await getSpecies();
          if (availableSpecies.length>0){
              await getSpecies();
          }
      };
-
      fetchDataAndThenGetSpecies();
  }, []); // This effect runs once on mount
-
+/*
  useEffect(() => {
      if (availableSpecies.length>0) {
        console.log("HERE" + availableSpecies + "PR");
          getSpecies();
      }
- }, [availableSpecies]); // This effect runs when availableSpecies or sqlResults is updated
+ }, [availableSpecies]); // This effect runs when availableSpecies or sqlResults is updated*/
 useEffect(() => {
     if (petResult) {
 
@@ -190,8 +191,6 @@ function resetFilters(){
 }
 
 
-
-
   async function flattenArr(arrToConvert){
     let result=[];
     for (let i=0;i<arrToConvert.length;i++){
@@ -313,18 +312,24 @@ function resetFilters(){
             <div className="filter_parent" onClick={()=>openFilters()}>Filters
 
                 </div>
-                {isOpen && (<div className="filter_body" id="filter_body">
+{isOpen && (<div className="filter_body" id="filter_body">
                                             <div className="hover_parent" id="filter_species">
                                                 Species
-                                                        <div id="species_child_container">
+                                                        <div className="hover_child_container" id="species_child_container">
                                                             {availableSpecies.map((species, i) => (
                                                                 <div key={i} onClick={() => setFilters('Species', species)}>
                                                                     {species}
-                                                                        <div className="filter_type hover_parent" id="filter_breed">
+                                                                    <br/>
+                                                                        <div className="filter_type hover_parent2" id="filter_breed">
                                                                         Breeds
-                                                                            {speciesArray.map((item, index) => (
-                                                                             <div key={index} onClick={() => setFilters('Breeds', 'name')}>{item} </div>
-                                                                            ))}
+                                                                             {breedMap.has(species) &&breedMap.get(species).map((item, index) => (
+                                                                                                <React.Fragment key={index}>
+                                                                                                    <div onClick={() => setFilters('Breeds', 'name')}>
+                                                                                                        {item}
+                                                                                                    </div>
+                                                                                                    <br/>
+                                                                                                </React.Fragment>
+                                                                                            ))}
                                                                         </div>
                                                                 </div>
                                                             ))}

@@ -28,29 +28,6 @@ async function sqlSelect(query){
             });
         });
 }
-async function sqlModify(query){
-        return new Promise((resolve, reject) => {
-            pool.query(query, (err, result) => {
-                if (err) {
-                    console.error('Error', err);
-                    reject(err);
-                } else {
-                    resolve(1);
-                }
-            });
-        });
-  return new Promise((resolve, reject) => {
-      pool.query(query, (err, result) => {
-          if (err) {
-              console.error('Error', err);
-              reject(err);
-          } else {
-              resolve(result.rows);
-          }
-      });
-  });
-}
-
 
 async function sqlInsert(query){
     await pool.query(
@@ -111,8 +88,6 @@ app.get('/', (req, res) => {
 the server can use req.session.user to get the user session id (this can be anything we want like email or the actual userID
 and we can wrap actions only for logged in users in:
 if (req.session.user){};
-
-
 */
 app.post('/login', async (req, res) => {
   let userDetails=JSON.parse(req.body);
@@ -125,7 +100,7 @@ app.post('/login', async (req, res) => {
   else{
     res.send(403,"Invalid Login!");
   }
-}
+});
 app.post('/register', async (req, res) => {
   try {
     // Parse the JSON data from the request body
