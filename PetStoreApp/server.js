@@ -373,6 +373,10 @@ app.post('/donate', async (req, res) => {
       return res.status(400).json({ error: 'Bad Request: Invalid or missing fields' });
     }
 
+<<<<<<< HEAD
+=======
+    // Assuming 'amount' is a numeric field in your database, convert it to a number
+>>>>>>> 2fe2348b6b39cefb38c46f015979d610cb84f893
     const donationAmount = parseFloat(amount);
 
     // Insert the donation record into the database
@@ -390,6 +394,15 @@ app.post('/donate', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
+=======
+
+
+
+
+
+
+>>>>>>> 2fe2348b6b39cefb38c46f015979d610cb84f893
 app.get('/organizations/:name', async (req, res) => {
   const orgName = req.params.name;
 
