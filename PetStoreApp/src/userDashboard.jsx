@@ -1,8 +1,7 @@
-
 // Import React and other necessary modules
 import React, { useState, useEffect } from "react";
-import Footer from './components/Footer';
-import Navbar from './components/Navbar';
+import Footer from "./components/Footer";
+import Navbar from "./components/Navbar";
 
 // Define the UserDashboard component
 function UserDashboard() {
@@ -12,7 +11,7 @@ function UserDashboard() {
   const [organizations, setOrganizations] = useState([]);
   const [petNames, setPetNames] = useState([]);
   const [petApplication, setPetApplication] = useState(null);
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
   const [userDonations, setUserDonations] = useState([]);
 
@@ -25,56 +24,57 @@ function UserDashboard() {
     const amount = event.target.amount.value;
 
     try {
-        // Send donation data to the server
-        const response = await fetch('http://localhost:5273/donate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ organization, amount })
-        });
+      // Send donation data to the server
+      const response = await fetch("http://localhost:5273/donate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ organization, amount }),
+      });
 
-        // Check if the donation was successfully submitted
-        if (response.ok) {
-            // Handle success, e.g., show a success message
-            console.log('Donation submitted successfully');
-            // Fetch pet application and donations again to update the data
-            fetchPetApplication();
-            fetchUserDonations(); // Update user donations after submission
-        } else {
-            // Handle errors, e.g., show an error message
-            console.error('Error submitting donation:', response.statusText);
-        }
+      // Check if the donation was successfully submitted
+      if (response.ok) {
+        // Handle success, e.g., show a success message
+        console.log("Donation submitted successfully");
+        // Fetch pet application and donations again to update the data
+        fetchPetApplication();
+        fetchUserDonations(); // Update user donations after submission
+      } else {
+        // Handle errors, e.g., show an error message
+        console.error("Error submitting donation:", response.statusText);
+      }
     } catch (error) {
-        console.error('Error submitting donation:', error);
+      console.error("Error submitting donation:", error);
     }
   };
 
   // Function to fetch organizations from the server
-  const fetchOrganizations = async() => {
-      try {
-        const PORT = 5273;
-        const response = await fetch(`http://${window.location.hostname}:${PORT}/organizations`);
-        const data = await response.json();
-        setOrganizations(data.organizations);
-        resolve();
-      } catch (error) {
-        console.error('Error fetching organizations', error);
-        reject(error); 
-      }
+  const fetchOrganizations = async () => {
+    try {
+      const PORT = 5273;
+      const response = await fetch(
+        `http://${window.location.hostname}:${PORT}/organizations`
+      );
+      const data = await response.json();
+      setOrganizations(data.organizations);
+      resolve();
+    } catch (error) {
+      console.error("Error fetching organizations", error);
+      reject(error);
+    }
   };
 
   // Function to fetch pets from the server
-  const fetchPets = async() => {
-      try {
-        const response = await fetch('http://localhost:5273/userDashboard/pets');
-        const data = await response.json();
-        setPetNames(data.petNames);
-        console.log(data.petNames)
-      } catch (error) {
-        console.error('Error fetching pets', error);
-        reject(error); 
-      }
+  const fetchPets = async () => {
+    try {
+      const response = await fetch("http://localhost:5273/userDashboard/pets");
+      const data = await response.json();
+      setPetNames(data.petNames);
+      console.log(data.petNames);
+    } catch (error) {
+      console.error("Error fetching pets", error);
+    }
   };
 
   // Function to fetch pet application from the server
@@ -86,7 +86,7 @@ function UserDashboard() {
         setPetApplication(data);
         resolve();
       } catch (error) {
-        console.error('Error fetching pet application', error);
+        console.error("Error fetching pet application", error);
         reject(error);
       }
     });
@@ -94,30 +94,29 @@ function UserDashboard() {
 
   // Function to fetch user details from the server
   const fetchUserDetails = async (username) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await fetch(`http://localhost:5273/users/${username}`);
-        const data = await response.json();
-        const fullName = `${data.fname} ${data.lname}`;
-        setUserName(fullName);
-        resolve();
-      } catch (error) {
-        console.error('Error fetching user details', error);
-        reject(error);
-      }
-    });
+    try {
+      const response = await fetch(`http://localhost:5273/users/${username}`);
+      const data = await response.json();
+      const fullName = `${data.fname} ${data.lname}`;
+      console.log(fullName)
+      setUserName(fullName);
+    } catch (error) {
+      console.error("Error fetching user details", error);
+    }
   };
 
   // Function to fetch user donations from the server
   const fetchUserDonations = async (username) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch(`http://localhost:5273/donations/${username}`);
+        const response = await fetch(
+          `http://localhost:5273/donations/${username}`
+        );
         const data = await response.json();
         setUserDonations(data.donations);
         resolve();
       } catch (error) {
-        console.error('Error fetching user donations', error);
+        console.error("Error fetching user donations", error);
         reject(error);
       }
     });
@@ -150,46 +149,50 @@ function UserDashboard() {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        console.log(response.json);
-        return response.json();
+        return response.text(); // Get response body as text
       })
       .then(data => {
-        if (data.loggedIn) {
-          setLoggedIn(true);
-          setUserName(data.username); // Set username if logged in
+        if (data.startsWith('{')) {
+          // Check if the response data starts with '{', indicating it's likely JSON
+          try {
+            const jsonData = JSON.parse(data); // Parse JSON from text
+            if (jsonData.loggedIn) {
+              setLoggedIn(true);
+              setUserName(jsonData.username); // Set username if logged in
+            } else {
+              setLoggedIn(false);
+              setUserName(""); // Clear username if not logged in
+            }
+          } catch (error) {
+            console.error('Error parsing JSON:', error);
+            // Handle JSON parsing error
+          }
         } else {
-          setLoggedIn(false);
-          setUserName(""); // Clear username if not logged in
+          console.error('Response is not JSON:', data);
+          // Handle case where response is not JSON
         }
       })
       .catch(error => {
-        console.error('Error checking if user is logged in:', error);
-        
-        // Check if the error is related to response parsing
-        if (error instanceof SyntaxError) {
-            console.error('Response parsing error. Response may not be valid JSON.');
-            // Handle the error accordingly, e.g., display a user-friendly message
-        } else {
-            // For other types of errors, log additional information
-            console.error('Additional information about the error:', error.message);
-            // setErrorMessage('Error: Unable to check login status');
-        }
+        console.error('Error checking if user is logged in:', error.message);
+        // Handle other errors
       });
   }, []);
+
+
 
   useEffect(() => {
     if (loggedIn) {
       // Fetch data for the logged-in user
       fetchData(userName)
         .then(() => {
-          console.log('Data fetching completed successfully');
+          console.log("Data fetching completed successfully");
         })
-        .catch(error => {
-          console.error('Error fetching data:', error);
+        .catch((error) => {
+          console.error("Error fetching data:", error);
         });
     }
   }, [loggedIn, userName]);
-  
+
   // Define function to fetch data from the server for the specific user
   const fetchData = async (username) => {
     return new Promise(async (resolve, reject) => {
@@ -209,71 +212,112 @@ function UserDashboard() {
   // Render the UI
   return (
     <div className="container">
-
       {/* Navbar */}
       <header data-bs-theme="dark">
-        <Navbar/>
+        <Navbar />
       </header>
-
       {/* Header */}
       <div className="header">
         <h1>Hello, {userName}</h1>
       </div>
-
       {/* Volunteer and Donate buttons */}
       <div className="section">
-        <button className="button" onClick={openVolunteerForm}>Volunteer</button>
-        <button className="button" onClick={openDonateForm}>Donate</button>
+        <button className="button" onClick={openVolunteerForm}>
+          Volunteer
+        </button>
+        <button className="button" onClick={openDonateForm}>
+          Donate
+        </button>
       </div>
-
       {/* Volunteer Form */}
-      <div className={`form-popup ${volunteerFormVisible ? 'open' : ''}`} id="volunteerForm">
+      <div
+        className={`form-popup ${volunteerFormVisible ? "open" : ""}`}
+        id="volunteerForm"
+      >
         <form action="/action_page.php" className="form-container">
           <h2>Volunteer</h2>
-          <label htmlFor="organization"><b>Organization:</b></label>
+          <label htmlFor="organization">
+            <b>Organization:</b>
+          </label>
           <select name="organization" id="organization">
-            {organizations.map(org => (
-              <option key={org} value={org}>{org}</option>
+            {organizations.map((org) => (
+              <option key={org} value={org}>
+                {org}
+              </option>
             ))}
           </select>
-          <br /><br />
-          <label htmlFor="task"><b>Task:</b></label>
+          <br />
+          <br />
+          <label htmlFor="task">
+            <b>Task:</b>
+          </label>
           <select name="task" id="task">
             <option value="Task1">Walk Dogs</option>
             <option value="Task2">Feed Animals</option>
             <option value="Task3">Clean Shelter</option>
             <option value="Task4">Answer Phone Calls</option>
           </select>
-          <br /><br />
-          <button type="submit" className="button">Submit</button>
-          <button type="button" className="button cancel" onClick={closeVolunteerForm}>Close</button>
+          <br />
+          <br />
+          <button type="submit" className="button">
+            Submit
+          </button>
+          <button
+            type="button"
+            className="button cancel"
+            onClick={closeVolunteerForm}
+          >
+            Close
+          </button>
         </form>
       </div>
-
       {/* Donate Form */}
-      <div className={`form-popup ${donateFormVisible ? 'open' : ''}`} id="donateForm">
+      <div
+        className={`form-popup ${donateFormVisible ? "open" : ""}`}
+        id="donateForm"
+      >
         <form action="/action_page.php" className="form-container">
           <h2>Donate</h2>
-          <label htmlFor="organization"><b>Organization:</b></label>
+          <label htmlFor="organization">
+            <b>Organization:</b>
+          </label>
           <select name="organization" id="organization">
-            {organizations.map(org => (
-              <option key={org} value={org}>{org}</option>
+            {organizations.map((org) => (
+              <option key={org} value={org}>
+                {org}
+              </option>
             ))}
           </select>
-          <br /><br />
-          <label htmlFor="amount"><b>Amount:</b></label>
-          <input type="text" id="amount" name="amount" placeholder="$0.00" /><br /><br />
-          <button type="submit" className="button" onClick={handleDonationSubmit}>Submit</button>
-          <button type="button" className="button cancel" onClick={closeDonateForm}>Close</button>
+          <br />
+          <br />
+          <label htmlFor="amount">
+            <b>Amount:</b>
+          </label>
+          <input type="text" id="amount" name="amount" placeholder="$0.00" />
+          <br />
+          <br />
+          <button
+            type="submit"
+            className="button"
+            onClick={handleDonationSubmit}
+          >
+            Submit
+          </button>
+          <button
+            type="button"
+            className="button cancel"
+            onClick={closeDonateForm}
+          >
+            Close
+          </button>
         </form>
       </div>
-
       {/* Display Pet Application and User Donations */}
       <div className="section">
         <h3>Pet Applications</h3>
         {petApplication ? (
           <div>
-            <p>User Name: {userName}</p> 
+            <p>User Name: {userName}</p>
             <p>Pet Name: {petApplication.pname}</p>
           </div>
         ) : (
@@ -283,12 +327,11 @@ function UserDashboard() {
         <h3>Donations</h3>
         {userDonations.map((donation, index) => (
           <div key={index}>
-            <p>Organization: {donation.organization}</p> 
+            <p>Organization: {donation.organization}</p>
             <p>Amount: ${donation.amount}</p>
           </div>
         ))}
       </div>
-
       {/* Pet Section */}
       <div className="section">
         <h2>Pets to Adopt!</h2>
@@ -301,17 +344,23 @@ function UserDashboard() {
           ))}
         </div>
       </div>
-
       {/* Pagination */}
       <div className="pagination">
-        <a href="#" className="w3-bar-item w3-button w3-hover-black">«</a>
-        <a href="#" className="w3-bar-item w3-black w3-button">1</a>
-        <a href="#" className="w3-bar-item w3-button w3-hover-black">2</a>
+        <a href="#" className="w3-bar-item w3-button w3-hover-black">
+          «
+        </a>
+        <a href="#" className="w3-bar-item w3-black w3-button">
+          1
+        </a>
+        <a href="#" className="w3-bar-item w3-button w3-hover-black">
+          2
+        </a>
         {/* <a href="#" className="w3-bar-item w3-button w3-hover-black">3</a>
         <a href="#" className="w3-bar-item w3-button w3-hover-black">4</a> */}
-        <a href="#" className="w3-bar-item w3-button w3-hover-black">»</a>
+        <a href="#" className="w3-bar-item w3-button w3-hover-black">
+          »
+        </a>
       </div>
-
       <Footer /> {/* Add the Footer component here */}
     </div>
   );

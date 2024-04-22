@@ -78,7 +78,7 @@ function EmpDashboard() {
       }
   
       // If the update is successful, reload the page to reflect the changes
-      // window.location.reload();
+      window.location.reload();
     } catch (error) {
       console.error('Error updating resource URL:', error.message);
       // Handle error - display an error message to the user or handle as needed

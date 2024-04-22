@@ -129,43 +129,53 @@ app.use(session({
   cookie: { secure: false }
 }));
 
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+// Logging Middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toLocaleString()}] ${req.method} ${req.url}`);
+  if (req.method === 'POST' || req.method === 'PUT') {
+    console.log('Request Body:', req.body);
+  }
+  next();
+});
+
 // Route to check if user is logged in
-app.get('/checkLoggedIn', (req, res) => {
-  // Check if user data is stored in session
-  // res.setHeader('Content-Type', 'application/json');
-  // res.setHeader('Accept', 'application/json');
+app.get('/checkLoggedIn', (req, res, next) => {
   if (req.session && req.session.user) {
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Accept', 'application/json');
     const { username } = req.session.user;
-    console.log(username)
     res.json({ loggedIn: true, username });
-    console.log('Response Headers:', res.getHeaders('Content-Type')); // Log headers
-    // res.json({ loggedIn: true, username });
   } else {
-    // res.setHeader('Content-Type', 'application/json');
-    console.log('Response Headers:', res.getHeaders()); // Log headers
     res.json({ loggedIn: false });
   }
 });
 
-app.post('/checkUser', async (req, res) => {
+// Route for checking user credentials
+app.post('/checkUser', async (req, res, next) => {
   try {
     const { username, password } = req.body;
-    
-    // Query the database to check if the username and password match
     const userExists = await checkUser(username, password);
     if (userExists) {
-      // Set session data to indicate user is signed in
-      req.session.user = { username }; // You can store additional user data if needed
-      console.log('User logged in successfully. Session data:', req.session.user);
+      req.session.user = { username };
+      console.log(req.session.user)
       res.json({ success: true, message: 'User signed in successfully' });
     } else {
       res.status(401).json({ success: false, message: 'Invalid username or password' });
     }
   } catch (error) {
-    console.error('Error checking user:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error); // Pass the error to the error handling middleware
+  }
+});
+
+// Route for fetching user dashboard
+app.get('/userDashboard/:userid', (req, res, next) => {
+  if (req.session.user) {
+    res.render('userDashboard', { username: req.session.user.username });
+  } else {
+    res.redirect('/signin');
   }
 });
 
@@ -187,18 +197,18 @@ async function checkUser(username, password) {
   }
 }
 
-app.get('/userDashboard/:userid', (req, res) => {
-  // Check if user session exists
-  if (req.session.user) {
-    // User is signed in, render the user dashboard
-    console.log('User session exists. Rendering userDashboard:', req.session.user);
-    res.render('userDashboard', { username: req.session.user.username });
-  } else {
-    // User is not signed in, redirect to sign-in page or display appropriate message
-    console.log('User session does not exist. Redirecting to signin page.');
-    res.redirect('/signin');
-  }
-});
+// app.get('/userDashboard/:userid', (req, res) => {
+//   // Check if user session exists
+//   if (req.session.user) {
+//     // User is signed in, render the user dashboard
+//     console.log('User session exists. Rendering userDashboard:', req.session.user);
+//     res.render('userDashboard', { username: req.session.user.username });
+//   } else {
+//     // User is not signed in, redirect to sign-in page or display appropriate message
+//     console.log('User session does not exist. Redirecting to signin page.');
+//     res.redirect('/signin');
+//   }
+// });
 
 
 app.get('/resources', async (req, res) => {
@@ -399,7 +409,7 @@ app.get('/userDashboard/pets', async (req, res) => {
 
 // Define endpoint to fetch the user's pet name with hardcoded user ID
 app.get('/adopt/:userid', async (req, res) => {
-  const userid = 'user001'; // Hardcoded user ID
+  // Hardcoded user ID
 
   try {
       // Execute the SQL query to fetch the user's pet name
@@ -431,7 +441,7 @@ app.get('/users/:userid', async (req, res) => {
   const { userid } = req.params;
 
   try {
-    const result = await pool.query('SELECT fname, lname FROM users WHERE userid = $1', [userid]);
+    const result = await pool.query('SELECT fname, lname FROM users WHERE email = $1', [userid]);
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
