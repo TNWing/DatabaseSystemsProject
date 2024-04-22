@@ -13,6 +13,7 @@ function UserDashboard() {
   const [petNames, setPetNames] = useState([]);
   const [petApplication, setPetApplication] = useState(null);
   const [userName, setUserName] = useState('');
+  const [loggedIn, setLoggedIn] = useState(false);
   const [userDonations, setUserDonations] = useState([]);
 
   // Define function to handle donation submission
@@ -49,33 +50,6 @@ function UserDashboard() {
     }
   };
 
-  // Define function to fetch data from the server
-  const fetchData = async() => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await fetchOrganizations();
-        await fetchPets();
-        await fetchPetApplication();
-        await fetchUserDetails();
-        await fetchUserDonations();
-        resolve(); 
-      } catch (error) {
-        reject(error); 
-      }
-    });
-  };
-
-  // UseEffect hook to fetch data when the component mounts
-  useEffect(() => {
-    fetchData()
-      .then(() => {
-        console.log('Data fetching completed successfully');
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
-//test cp,,m
   // Function to fetch organizations from the server
   const fetchOrganizations = async() => {
     return new Promise(async (resolve, reject) => {
@@ -108,47 +82,47 @@ function UserDashboard() {
   };
 
   // Function to fetch pet application from the server
-  const fetchPetApplication = async() => {
+  const fetchPetApplication = async (username) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch('http://localhost:5273/adopt/user001');
+        const response = await fetch(`http://localhost:5273/adopt/${username}`);
         const data = await response.json();
         setPetApplication(data);
-        resolve(); 
+        resolve();
       } catch (error) {
         console.error('Error fetching pet application', error);
-        reject(error); 
+        reject(error);
       }
     });
   };
 
   // Function to fetch user details from the server
-  const fetchUserDetails =async () => {
+  const fetchUserDetails = async (username) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch('http://localhost:5273/users/user001'); 
+        const response = await fetch(`http://localhost:5273/users/${username}`);
         const data = await response.json();
-        const fullName = `${data.fname} ${data.lname}`; 
+        const fullName = `${data.fname} ${data.lname}`;
         setUserName(fullName);
-        resolve(); 
+        resolve();
       } catch (error) {
         console.error('Error fetching user details', error);
-        reject(error); 
+        reject(error);
       }
     });
   };
 
   // Function to fetch user donations from the server
-  const fetchUserDonations = async() => {
+  const fetchUserDonations = async (username) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch('http://localhost:5273/donations/user001');
+        const response = await fetch(`http://localhost:5273/donations/${username}`);
         const data = await response.json();
         setUserDonations(data.donations);
-        resolve(); 
+        resolve();
       } catch (error) {
         console.error('Error fetching user donations', error);
-        reject(error); 
+        reject(error);
       }
     });
   };
@@ -174,23 +148,67 @@ function UserDashboard() {
   };
   // const [fname, setFname] = useState(""); // State to store the first name
 
-  // useEffect(() => {
-  //   // Fetch the first name associated with the signed-in username
-  //   const fetchFname = async () => {
-  //     try {
-  //       const response = await fetch(`http://${window.location.hostname}:5273/getFname/${username}`);
-  //       if (!response.ok) {
-  //         throw new Error('Failed to fetch first name');
-  //       }
-  //       const data = await response.json();
-  //       setFname(data.fname);
-  //     } catch (error) {
-  //       console.error('Error fetching first name:', error.message);
-  //     }
-  //   };
+  useEffect(() => {
+    fetch('/checkLoggedIn')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        console.log(response.json);
+        return response.json();
+      })
+      .then(data => {
+        if (data.loggedIn) {
+          setLoggedIn(true);
+          setUserName(data.username); // Set username if logged in
+        } else {
+          setLoggedIn(false);
+          setUserName(""); // Clear username if not logged in
+        }
+      })
+      .catch(error => {
+        // console.error('Error checking if user is logged in:', error);
+        
+        // Check if the error is related to response parsing
+        if (error instanceof SyntaxError) {
+            console.error('Response parsing error. Response may not be valid JSON.');
+            // Handle the error accordingly, e.g., display a user-friendly message
+        } else {
+            // For other types of errors, log additional information
+            console.error('Additional information about the error:', error.message);
+            // setErrorMessage('Error: Unable to check login status');
+        }
+      });
+  }, []);
 
-  //   fetchFname(); // Call the fetchFname function when the component mounts
-  // }, [username]);
+  useEffect(() => {
+    if (loggedIn) {
+      // Fetch data for the logged-in user
+      fetchData(userName)
+        .then(() => {
+          console.log('Data fetching completed successfully');
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    }
+  }, [loggedIn, userName]);
+  
+  // Define function to fetch data from the server for the specific user
+  const fetchData = async (username) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await fetchOrganizations();
+        await fetchPets();
+        await fetchPetApplication(username);
+        await fetchUserDetails(username);
+        await fetchUserDonations(username);
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
 
   // Render the UI
   return (
@@ -263,7 +281,7 @@ function UserDashboard() {
             <p>Pet Name: {petApplication.pname}</p>
           </div>
         ) : (
-          <p>No pet application found for user001</p>
+          <p>No pet application found for {userName}</p>
         )}
 
         <h3>Donations</h3>
@@ -293,8 +311,8 @@ function UserDashboard() {
         <a href="#" className="w3-bar-item w3-button w3-hover-black">«</a>
         <a href="#" className="w3-bar-item w3-black w3-button">1</a>
         <a href="#" className="w3-bar-item w3-button w3-hover-black">2</a>
-        <a href="#" className="w3-bar-item w3-button w3-hover-black">3</a>
-        <a href="#" className="w3-bar-item w3-button w3-hover-black">4</a>
+        {/* <a href="#" className="w3-bar-item w3-button w3-hover-black">3</a>
+        <a href="#" className="w3-bar-item w3-button w3-hover-black">4</a> */}
         <a href="#" className="w3-bar-item w3-button w3-hover-black">»</a>
       </div>
 

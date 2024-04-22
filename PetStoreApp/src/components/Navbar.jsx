@@ -48,20 +48,13 @@ function Navbar() {
         throw new Error('Failed to sign in');
       }
       const data = await response.json();
-      if (data.exists) {
-        // User exists
+      if (data.success) { // Check if login is successful
+        // Redirect to userDashboard
         window.location.href = '/userDashboard';
         console.log('User signed in');
-        // Redirect to appropriate dashboard
-        // if (data.isAdmin) {
-        //   window.location.href = '/empDashboard';
-        // } else {
-        //   window.location.href = '/userDashboard';
-        // }
       } else {
-        // User does not exist or incorrect credentials
+        // Handle incorrect credentials or other login failures
         setLoginError('Incorrect username or password');
-        // Handle accordingly
       }
     } catch (error) {
       console.error('Error signing in:', error.message);

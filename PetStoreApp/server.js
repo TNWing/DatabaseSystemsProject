@@ -6,7 +6,7 @@ import session from 'express-session';
 import cors from 'cors'
 
 const app = express();
-import bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
 const PORT = 5273;
 app.set("view engine", "ejs")
 app.set('port',PORT)
@@ -15,7 +15,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.text());
 app.use((req, res, next) => {
-    res.header('Content-Type', 'text/plain');
+    res.setHeader('Content-Type', 'application/json');
+    // res.setHeader('Accept', 'application/json');
     next();
 });
 
@@ -128,10 +129,48 @@ app.use(session({
   cookie: { secure: false }
 }));
 
+// Route to check if user is logged in
+app.get('/checkLoggedIn', (req, res) => {
+  // Check if user data is stored in session
+  // res.setHeader('Content-Type', 'application/json');
+  // res.setHeader('Accept', 'application/json');
+  if (req.session && req.session.user) {
+    const { username } = req.session.user;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({ loggedIn: true, username });
+    console.log('Response Headers:', res.getHeaders('Content-Type')); // Log headers
+    // res.json({ loggedIn: true, username });
+  } else {
+    // res.setHeader('Content-Type', 'application/json');
+    console.log('Response Headers:', res.getHeaders()); // Log headers
+    res.json({ loggedIn: false });
+  }
+});
+
+app.post('/checkUser', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    // Query the database to check if the username and password match
+    const userExists = await checkUser(username, password);
+    if (userExists) {
+      // Set session data to indicate user is signed in
+      req.session.user = { username }; // You can store additional user data if needed
+      console.log('User logged in successfully. Session data:', req.session.user);
+      res.json({ success: true, message: 'User signed in successfully' });
+    } else {
+      res.status(401).json({ success: false, message: 'Invalid username or password' });
+    }
+  } catch (error) {
+    console.error('Error checking user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 async function checkUser(username, password) {
   try {
-    console.log(username)
-    console.log(password)
+    // console.log(username)
+    // console.log(password)
     // Query the database to check if the username and password match
     const result = await pool.query('SELECT * FROM Users WHERE Email = $1 AND password = $2', [username, password]);
     // console.log(result)
@@ -146,38 +185,19 @@ async function checkUser(username, password) {
   }
 }
 
-app.post('/checkUser', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    console.log(username)
-    console.log(password)
-    // Query the database to check if the username and password match
-    const userExists = await checkUser(username, password);
-    // if (userExists) {
-    //   // Set session data to indicate user is signed in
-    //   req.session.user = { username }; // You can store additional user data if needed
-    //   res.json({ success: true, message: 'User signed in successfully' });
-    // } else {
-    //   res.status(401).json({ success: false, message: 'Invalid username or password' });
-    // }
-    // Send JSON response based on whether the username and password match or not
-    res.json({ exists: userExists });
-  } catch (error) {
-    console.error('Error checking user:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-app.get('/userDashboard', (req, res) => {
+app.get('/userDashboard/:userid', (req, res) => {
   // Check if user session exists
   if (req.session.user) {
     // User is signed in, render the user dashboard
+    console.log('User session exists. Rendering userDashboard:', req.session.user);
     res.render('userDashboard', { username: req.session.user.username });
   } else {
     // User is not signed in, redirect to sign-in page or display appropriate message
+    console.log('User session does not exist. Redirecting to signin page.');
     res.redirect('/signin');
   }
 });
+
 
 app.get('/resources', async (req, res) => {
   try {
