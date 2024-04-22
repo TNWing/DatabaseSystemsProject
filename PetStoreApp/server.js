@@ -135,8 +135,10 @@ app.get('/checkLoggedIn', (req, res) => {
   // res.setHeader('Content-Type', 'application/json');
   // res.setHeader('Accept', 'application/json');
   if (req.session && req.session.user) {
-    const { username } = req.session.user;
     res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Accept', 'application/json');
+    const { username } = req.session.user;
+    console.log(username)
     res.json({ loggedIn: true, username });
     console.log('Response Headers:', res.getHeaders('Content-Type')); // Log headers
     // res.json({ loggedIn: true, username });
@@ -383,11 +385,12 @@ console.log("TEST");
 });
 
 
-app.get('/pets', async (req, res) => {
+app.get('/userDashboard/pets', async (req, res) => {
   try {
-    const result = await pool.query('SELECT pname FROM pets');
+    const result = await pool.query('SELECT pname FROM Pets');
     const petNames = result.rows.map(row => row.pname);
     res.json({ petNames });
+    console.log(res.json({ petNames }))
   } catch (error) {
     console.error('Error fetching pets', error);
     res.status(500).json({ error: 'Internal server error' });

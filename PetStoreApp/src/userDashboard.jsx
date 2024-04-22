@@ -52,7 +52,6 @@ function UserDashboard() {
 
   // Function to fetch organizations from the server
   const fetchOrganizations = async() => {
-    return new Promise(async (resolve, reject) => {
       try {
         const PORT = 5273;
         const response = await fetch(`http://${window.location.hostname}:${PORT}/organizations`);
@@ -63,22 +62,19 @@ function UserDashboard() {
         console.error('Error fetching organizations', error);
         reject(error); 
       }
-    });
   };
 
   // Function to fetch pets from the server
   const fetchPets = async() => {
-    return new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch('http://localhost:5273/pets');
+        const response = await fetch('http://localhost:5273/userDashboard/pets');
         const data = await response.json();
         setPetNames(data.petNames);
-        resolve(); 
+        console.log(data.petNames)
       } catch (error) {
         console.error('Error fetching pets', error);
         reject(error); 
       }
-    });
   };
 
   // Function to fetch pet application from the server
@@ -167,7 +163,7 @@ function UserDashboard() {
         }
       })
       .catch(error => {
-        // console.error('Error checking if user is logged in:', error);
+        console.error('Error checking if user is logged in:', error);
         
         // Check if the error is related to response parsing
         if (error instanceof SyntaxError) {
@@ -299,7 +295,7 @@ function UserDashboard() {
         <div className="pet-container">
           {petNames.map((petName, index) => (
             <div className="pet-card" key={index}>
-              <img src={`https://static.vecteezy.com/system/resources/thumbnails/005/857/332/small_2x/funny-portrait-of-cute-corgi-dog-outdoors-free-photo.jpg`} alt={petName} />
+              {/* <img src={`https://static.vecteezy.com/system/resources/thumbnails/005/857/332/small_2x/funny-portrait-of-cute-corgi-dog-outdoors-free-photo.jpg`} alt={petName} /> */}
               <h3>{petName}</h3>
             </div>
           ))}
