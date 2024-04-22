@@ -143,24 +143,27 @@ app.use((req, res, next) => {
   next();
 });
 
-// Route to check if user is logged in
-app.get('/checkLoggedIn', (req, res, next) => {
+app.get('/checkLoggedIn', (req, res) => {
   if (req.session && req.session.user) {
     const { username } = req.session.user;
-    res.json({ loggedIn: true, username });
+    console.log(username)
+    res.status(200).json({ loggedIn: true, username }); // Return JSON response for logged-in user
   } else {
-    res.json({ loggedIn: false });
+    res.status(401).json({ loggedIn: false, message: 'User is not logged in' }); // Return JSON error response for not logged-in user
   }
 });
+
 
 // Route for checking user credentials
 app.post('/checkUser', async (req, res, next) => {
   try {
     const { username, password } = req.body;
-    const userExists = await checkUser(username, password);
+    const result = await pool.query('SELECT * FROM Users WHERE Email = $1 AND password = $2', [username, password]);
+    const userExists = result.rows.length > 0;
+
     if (userExists) {
       req.session.user = { username };
-      console.log(req.session.user)
+      console.log(req.session.user);
       res.json({ success: true, message: 'User signed in successfully' });
     } else {
       res.status(401).json({ success: false, message: 'Invalid username or password' });
@@ -178,24 +181,6 @@ app.get('/userDashboard/:userid', (req, res, next) => {
     res.redirect('/signin');
   }
 });
-
-async function checkUser(username, password) {
-  try {
-    // console.log(username)
-    // console.log(password)
-    // Query the database to check if the username and password match
-    const result = await pool.query('SELECT * FROM Users WHERE Email = $1 AND password = $2', [username, password]);
-    // console.log(result)
-    // If a row with the given username and password exists, return true; otherwise, return false
-    console.log(result.rows.length > 0)
-    return result.rows.length > 0;
-  } catch (error) {
-    // Log any errors that occur during the database query
-    console.error('Error checking if user exists:', error);
-    // Return false in case of an error or if the query fails
-    return false;
-  }
-}
 
 // app.get('/userDashboard/:userid', (req, res) => {
 //   // Check if user session exists

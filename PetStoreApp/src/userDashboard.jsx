@@ -75,17 +75,6 @@ function UserDashboard() {
   //   });
   // };
 
-  // UseEffect hook to fetch data when the component mounts
-  useEffect(() => {
-    fetchData()
-      .then(() => {
-        console.log('Data fetching completed successfully');
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
-
   const fetchOrganizations = async () => {
     try {
       const response = await fetch('http://localhost:5273/organizations');
@@ -208,8 +197,6 @@ function UserDashboard() {
       });
   }, []);
 
-
-
   useEffect(() => {
     if (loggedIn) {
       // Fetch data for the logged-in user
@@ -222,6 +209,17 @@ function UserDashboard() {
         });
     }
   }, [loggedIn, userName]);
+
+  // UseEffect hook to fetch data when the component mounts
+  useEffect(() => {
+    fetchData()
+      .then(() => {
+        console.log('Data fetching completed successfully');
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
 
   // Define function to fetch data from the server for the specific user
   const fetchData = async (username) => {
