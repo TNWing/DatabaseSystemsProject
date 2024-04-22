@@ -277,58 +277,21 @@ app.get('/organizations', async (req, res) => {
   }
 });
 
-
-// Define endpoint to handle donation form submission
-app.post('/donate', async (req, res) => {
-  // Extract data from the request body
-  const { organization, amount, userid } = req.body;
-console.log("TEST");
-  try {
-      // Fetch the orgid based on the selected organization name
-      const orgResult = await pool.query(
-          `SELECT orgid FROM organizations WHERE name = $1`,
-          [organization]
-      );
-
-      // Check if organization exists
-      if (orgResult.rows.length === 0) {
-          return res.status(404).json({ error: 'Organization not found' });
-      }
-
-      const orgid = orgResult.rows[0].id;
-
-      // Log the data before inserting into the database
-      console.log('Data to be inserted into donations table:', { userid, orgid, amount });
-
-      // Perform SQL insert operation to add donation information to the database
-      const result = await pool.query(
-          `INSERT INTO donations (userid, orgid, amount) VALUES ($1, $2, $3)`,
-          [userid, orgid, amount]
-      );
-
-      // Log the inserted data
-      console.log('Donation submitted:', { userid, orgid, amount });
-
-      // Respond with success message
-      res.status(200).json({ message: 'Donation submitted successfully' });
-  } catch (error) {
-      // Handle errors
-      console.error('Error submitting donation:', error);
-      res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-
 app.get('/pets', async (req, res) => {
   try {
-    const result = await pool.query('SELECT pname FROM pets');
-    const petNames = result.rows.map(row => row.pname);
-    res.json({ petNames });
+    const result = await pool.query(`
+      SELECT p.pname, pi.imageURL
+      FROM pets p 
+      JOIN petImage_Belongs pi ON p.petid = pi.petid
+    `);
+    const petsData = result.rows;
+    res.json({ petsData });
   } catch (error) {
-    console.error('Error fetching pets', error);
+    console.error('Error fetching pets with images', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // Define endpoint to fetch the user's pet name with hardcoded user ID
 app.get('/adopt/:userid', async (req, res) => {
@@ -398,43 +361,59 @@ app.get('/donations/:userid', async (req, res) => {
 });
 
 
-
-// Define endpoint to handle donation form submission
+// Submit donation endpoint
 app.post('/donate', async (req, res) => {
-  // Extract data from the request body
-  const { organization, amount, userid } = req.body;
+  try {
+    // Extract the required fields from the request body
+    const { userid, org_id, amount } = req.body;
+
+    // Validate that all required fields are present and have valid values
+    if (!userid || !org_id || !amount || isNaN(parseFloat(amount))) {
+      console.error('Invalid or missing fields in request body');
+      return res.status(400).json({ error: 'Bad Request: Invalid or missing fields' });
+    }
+
+    // Assuming 'amount' is a numeric field in your database, convert it to a number
+    const donationAmount = parseFloat(amount);
+
+    // Insert the donation record into the database
+    const insertQuery = `
+      INSERT INTO donate (userid, org_id, amount)
+      VALUES ($1, $2, $3)
+    `;
+    await pool.query(insertQuery, [userid, org_id, donationAmount]);
+
+    // Send success response
+    res.status(200).json({ success: true, message: 'Donation submitted successfully' });
+  } catch (error) {
+    console.error('Error submitting donation:', error);
+    res.status(500).json({ success: false, message: 'Failed to submit donation' });
+  }
+});
+
+
+
+
+
+
+
+app.get('/organizations/:name', async (req, res) => {
+  const orgName = req.params.name;
 
   try {
-    // Fetch the orgid based on the selected organization name
-    const orgResult = await pool.query(
-      `SELECT org_id FROM organization WHERE name = $1`,
-      [organization]
-    );
+    // Query the database to fetch the organization ID based on its name
+    const result = await pool.query('SELECT org_id FROM organization WHERE name = $1', [orgName]);
 
-    // Check if organization exists
-    if (orgResult.rows.length === 0) {
+    if (result.rows.length === 0) {
+      // If no organization is found with the given name, return a 404 status code
       return res.status(404).json({ error: 'Organization not found' });
     }
 
-    const orgid = orgResult.rows[0].id;
-
-    // Log the data before inserting into the database
-    console.log('Data to be inserted into donate table:', { userid, orgid, amount });
-
-    // Perform SQL insert operation to add donation information to the database
-    const result = await pool.query(
-      `INSERT INTO donate (userid, org_id, amount) VALUES ($1, $2, $3)`,
-      [userid, orgid, amount]
-    );
-
-    // Log the inserted data
-    console.log('Donation submitted:', { userid, orgid, amount });
-
-    // Respond with success message
-    res.status(200).json({ message: 'Donation submitted successfully' });
+    // Extract the org_id from the query result and send it in the response
+    const orgId = result.rows[0].org_id;
+    res.json({ org_id: orgId });
   } catch (error) {
-    // Handle errors
-    console.error('Error submitting donation:', error);
+    console.error('Error fetching organization details by name:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
