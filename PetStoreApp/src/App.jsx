@@ -1,12 +1,38 @@
-import React from 'react';
-import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js";
+import './App.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import { Link } from 'react-router-dom'
-
+import PetAdoption from './PetAdoption'; // Import PetAdoption component
 
 function App() {
+  // Define states for pet names and images
+  const [petNames, setPetNames] = useState([]);
+  const [petImages, setPetImages] = useState([]);
+
+  const fetchPets = async () => {
+    try {
+      const response = await fetch('http://localhost:5273/pets');
+      const data = await response.json();
+      console.log('Fetched pets data:', data); // Add this line to log the fetched data
+
+      if (data && data.petsData && Array.isArray(data.petsData)) {
+        const petNamesArray = data.petsData.map(pet => pet.pname); 
+        const petImagesArray = data.petsData.map(pet => pet.imageurl); 
+        setPetNames(petNamesArray);
+        setPetImages(petImagesArray);
+      } else {
+        console.error('Invalid pets data format');
+      }
+    } catch (error) {
+      console.error('Error fetching pets', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPets(); // Fetch pet data when component mounts
+  }, []);
+
   return (
     <div>
       <header data-bs-theme="dark">
@@ -26,7 +52,7 @@ function App() {
                 <div className="carousel-caption text-start transparent-bg">
                   <h1>Bringing joy.</h1>
                   <p className="opacity-75">Join us in our mission to bring joy into the lives of pets and people alike, one adoption at a time.</p>
-                  <p><Link className="btn btn-lg btn-primary" href="#">Adopt</Link></p>
+                  <p><a className="btn btn-lg btn-primary" href="#">Adopt</a></p>
                 </div>
               </div>
             </div>
@@ -46,7 +72,7 @@ function App() {
                 <div className="carousel-caption text-end transparent-bg">
                   <h1>Transforming lives.</h1>
                   <p>From shelter to forever family, we're dedicated to guiding pets on their journey to finding lasting love and companionship.</p>
-                  <p><Link className="btn btn-lg btn-primary" href="/resources">Resources</Link></p>
+                  <p><a className="btn btn-lg btn-primary" href="/resources">Resources</a></p>
                 </div>
               </div>
             </div>
@@ -61,83 +87,9 @@ function App() {
           </button>
         </div>
 
-        <div className="container marketing">
-          <div className="team-heading-container">
-            <h2 className="fw-normal">Meet the team</h2>
-          </div>
-          <div className="row">
-            <div className="col-lg-4">
-              <svg className="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
-                <title>Placeholder</title>
-                <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-              </svg>
-              <h2 className="fw-normal">Dante Amicarella</h2>
-              <p>Dante's bio and role in the team.</p>
-              <p><a className="btn btn-secondary" href="#">View details &raquo;</a></p>
-            </div>
-            <div className="col-lg-4">
-              <svg className="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
-                <title>Placeholder</title>
-                <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-              </svg>
-              <h2 className="fw-normal">Jessilyn Collette</h2>
-              <p>Jess's bio and role in the team.</p>
-              <p><a className="btn btn-secondary" href="#">View details &raquo;</a></p>
-            </div>
-            <div className="col-lg-4">
-              <svg className="bd-placeholder-img rounded-circle" width="140" height="140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
-                <title>Placeholder</title>
-                <rect width="100%" height="100%" fill="var(--bs-secondary-color)" />
-              </svg>
-              <h2 className="fw-normal">Trevor Ng</h2>
-              <p>Trevor's bio and role in the team.</p>
-              <p><a className="btn btn-secondary" href="#">View details &raquo;</a></p>
-            </div>
-          </div>
-        </div>
+        {/* Display PetAdoption component */}
+        <PetAdoption petNames={petNames} petImages={petImages} />
 
-        <div>
-          {/* Start Featurettes */}
-          <hr className="featurette-divider" />
-          
-          <div className="row featurette">
-            <div className="col-md-7">
-              <h2 className="featurette-heading fw-normal lh-1">Learn about your pet. <span className="text-body-secondary">It’ll blow your mind.</span></h2>
-              <p className="lead">Find out what your pet needs to eat in order to be the best version of itself.</p>
-            </div>
-            <div className="col-md-5">
-              <img src="src/images/petImage4.png" alt="Featurette Image" className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="800" height="1200" href="#"/>
-            </div>
-
-          </div>
-
-          <hr className="featurette-divider" />
-
-          <div className="row featurette">
-            <div className="col-md-7 order-md-2">
-              <h2 className="featurette-heading fw-normal lh-1">We find the cutest pets. <span className="text-body-secondary">See for yourself.</span></h2>
-              <p className="lead">We have a wide variety of pets all with different personalities and characteristics. Every pet is unique in its own way. </p>
-            </div>
-            <div className="col-md-5 order-md-1">
-              <img src="src/images/petImages5.webp" alt="Featurette Image" className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="800" height="800" href="#"/>
-            </div>
-          </div>
-
-          <hr className="featurette-divider" />
-
-          <div className="row featurette">
-            <div className="col-md-7">
-              <h2 className="featurette-heading fw-normal lh-1">Apply for adoption. <span className="text-body-secondary">Checkmate.</span></h2>
-              <p className="lead">Once you have fallen in love with one of our pets apply for adoption, our dedicated team will start working extremely hard to ensure the process is smooth and transparent.</p>
-            </div>
-            <div className="col-md-5">
-              <img src="src/images/petImages6.png" alt="Featurette Image" className="bd-placeholder-img bd-placeholder-img-lg featurette-image img-fluid mx-auto" width="800" height="1200" href="#"/>
-            </div>
-          </div>
-
-          <hr className="featurette-divider" />
-          {/* End Featurettes */}
-        </div>
         <Footer/>
       </main>
     </div>
@@ -145,8 +97,3 @@ function App() {
 }
 
 export default App;
-
-/* <form className="d-flex" role="search">
-                <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button className="btn btn-outline-success" type="submit">Search</button>
-              </form> */

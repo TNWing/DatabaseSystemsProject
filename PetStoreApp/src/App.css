@@ -115,6 +115,36 @@ body {
   .featurette-image {
     padding: 50px; /* Add padding to all sides of the image */
   }
+
+  .pet-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-top: 40px;
+    border: 1px solid #ccc; /* Border style, color, and width */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px; 
+  }
+  
+  .pet-card {
+    width: 30%;
+    margin-bottom: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .pet-card img {
+    width: 100%;
+    border-radius: 8px 8px 0 0;
+    
+  }
+  
+  .pet-card-content {
+    padding: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
   
   
   /* rtl:end:remove */
@@ -140,4 +170,5 @@ body {
       margin-top: 7rem;
     }
   }
+  
   
