@@ -6,7 +6,6 @@ import Navbar from "./components/Navbar";
 // Define the UserDashboard component
 function UserDashboard() {
   // Define states for various data
-  const [volunteerFormVisible, setVolunteerFormVisible] = useState(false);
   const [donateFormVisible, setDonateFormVisible] = useState(false);
   const [organizations, setOrganizations] = useState([]);
   const [petNames, setPetNames] = useState([]);
@@ -14,58 +13,89 @@ function UserDashboard() {
   const [userName, setUserName] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
   const [userDonations, setUserDonations] = useState([]);
+  const [petImages, setPetImages] = useState([]);
 
-  // Define function to handle donation submission
+
   const handleDonationSubmit = async (event) => {
     event.preventDefault();
-
-    // Extract data from the form
-    const organization = event.target.organization.value;
-    const amount = event.target.amount.value;
-
+  
+    const form = event.target.closest('form');
+    const organizationName = form.querySelector('#organization').value; // Get the organization name from the dropdown
+    const amount = form.querySelector('#amount').value; // Get the amount as a string
+  
     try {
-      // Send donation data to the server
-      const response = await fetch("http://localhost:5273/donate", {
-        method: "POST",
+      // Fetch org_id using the organization name from the backend endpoint
+      const orgIdResponse = await fetch(`http://localhost:5273/organizations/${organizationName}`);
+      if (!orgIdResponse.ok) {
+        throw new Error(`Organization '${organizationName}' not found`);
+      }
+  
+      const orgIdData = await orgIdResponse.json();
+      const orgId = orgIdData.org_id;
+  
+      // Submit the donation with the retrieved org_id
+      const donationResponse = await fetch('http://localhost:5273/donate', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ organization, amount }),
+        body: JSON.stringify({
+          userid: 'user001',
+          org_id: orgId,
+          amount: amount, // Ensure amount is sent as a string
+        }),
       });
-
-      // Check if the donation was successfully submitted
-      if (response.ok) {
-        // Handle success, e.g., show a success message
-        console.log("Donation submitted successfully");
-        // Fetch pet application and donations again to update the data
-        fetchPetApplication();
-        fetchUserDonations(); // Update user donations after submission
+      console.log('Request Body:', { userid: 'user001', org_id: orgId, amount: amount });
+      if (donationResponse.ok) {
+        console.log('Donation submitted successfully');
+        fetchUserDonations();
+        closeDonateForm();
       } else {
-        // Handle errors, e.g., show an error message
-        console.error("Error submitting donation:", response.statusText);
+        console.error('Error submitting donation:', donationResponse.statusText);
       }
     } catch (error) {
-      console.error("Error submitting donation:", error);
+      console.error('Error submitting donation:', error.message);
     }
   };
+  
+  
+  // Define function to fetch data from the server
+  // const fetchData = async() => {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       await fetchPets();
+  //       await fetchOrganizations();
+  //       await fetchPetApplication();
+  //       await fetchUserDetails();
+  //       await fetchUserDonations();
+  //       resolve(); 
+  //     } catch (error) {
+  //       reject(error); 
+  //     }
+  //   });
+  // };
 
-  // Function to fetch organizations from the server
+  // UseEffect hook to fetch data when the component mounts
+  useEffect(() => {
+    fetchData()
+      .then(() => {
+        console.log('Data fetching completed successfully');
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
+
   const fetchOrganizations = async () => {
     try {
-      const PORT = 5273;
-      const response = await fetch(
-        `http://${window.location.hostname}:${PORT}/organizations`
-      );
+      const response = await fetch('http://localhost:5273/organizations');
       const data = await response.json();
       setOrganizations(data.organizations);
-      resolve();
     } catch (error) {
-      console.error("Error fetching organizations", error);
-      reject(error);
+      console.error('Error fetching organizations', error);
     }
   };
 
-  // Function to fetch pets from the server
   const fetchPets = async () => {
     try {
       const response = await fetch('http://localhost:5273/pets');
@@ -84,7 +114,9 @@ function UserDashboard() {
       console.error('Error fetching pets', error);
     }
   };
-
+  
+  
+  
   // Function to fetch pet application from the server
   const fetchPetApplication = async (username) => {
     return new Promise(async (resolve, reject) => {
@@ -128,16 +160,6 @@ function UserDashboard() {
         reject(error);
       }
     });
-  };
-
-  // Function to open the volunteer form
-  const openVolunteerForm = () => {
-    setVolunteerFormVisible(true);
-  };
-
-  // Function to close the volunteer form
-  const closeVolunteerForm = () => {
-    setVolunteerFormVisible(false);
   };
 
   // Function to open the donate form
@@ -228,63 +250,15 @@ function UserDashboard() {
       <div className="header">
         <h1>Hello, {userName}</h1>
       </div>
-      {/* Volunteer and Donate buttons */}
+
+      {/*Donate buttons */}
       <div className="section">
-        <button className="button" onClick={openVolunteerForm}>
-          Volunteer
-        </button>
-        <button className="button" onClick={openDonateForm}>
-          Donate
-        </button>
+        <button className="button" onClick={openDonateForm}>Donate</button>
       </div>
-      {/* Volunteer Form */}
-      <div
-        className={`form-popup ${volunteerFormVisible ? "open" : ""}`}
-        id="volunteerForm"
-      >
-        <form action="/action_page.php" className="form-container">
-          <h2>Volunteer</h2>
-          <label htmlFor="organization">
-            <b>Organization:</b>
-          </label>
-          <select name="organization" id="organization">
-            {organizations.map((org) => (
-              <option key={org} value={org}>
-                {org}
-              </option>
-            ))}
-          </select>
-          <br />
-          <br />
-          <label htmlFor="task">
-            <b>Task:</b>
-          </label>
-          <select name="task" id="task">
-            <option value="Task1">Walk Dogs</option>
-            <option value="Task2">Feed Animals</option>
-            <option value="Task3">Clean Shelter</option>
-            <option value="Task4">Answer Phone Calls</option>
-          </select>
-          <br />
-          <br />
-          <button type="submit" className="button">
-            Submit
-          </button>
-          <button
-            type="button"
-            className="button cancel"
-            onClick={closeVolunteerForm}
-          >
-            Close
-          </button>
-        </form>
-      </div>
+
       {/* Donate Form */}
-      <div
-        className={`form-popup ${donateFormVisible ? "open" : ""}`}
-        id="donateForm"
-      >
-        <form action="/action_page.php" className="form-container">
+      <div className={`form-popup ${donateFormVisible ? 'open' : ''}`} id="donateForm">
+      <form onSubmit={handleDonationSubmit} className="form-container">
           <h2>Donate</h2>
           <label htmlFor="organization">
             <b>Organization:</b>
@@ -296,28 +270,11 @@ function UserDashboard() {
               </option>
             ))}
           </select>
-          <br />
-          <br />
-          <label htmlFor="amount">
-            <b>Amount:</b>
-          </label>
-          <input type="text" id="amount" name="amount" placeholder="$0.00" />
-          <br />
-          <br />
-          <button
-            type="submit"
-            className="button"
-            onClick={handleDonationSubmit}
-          >
-            Submit
-          </button>
-          <button
-            type="button"
-            className="button cancel"
-            onClick={closeDonateForm}
-          >
-            Close
-          </button>
+          <br /><br />
+          <label htmlFor="amount"><b>Amount:</b></label>
+          <input type="text" id="amount" name="amount" placeholder="$0.00" /><br /><br />
+          <button type="submit" className="button">Submit</button>
+          <button type="button" className="button cancel" onClick={closeDonateForm}>Close</button>
         </form>
       </div>
       {/* Display Pet Application and User Donations */}
@@ -340,13 +297,13 @@ function UserDashboard() {
           </div>
         ))}
       </div>
-      {/* Pet Section */}
       <div className="section">
         <h2>Pets to Adopt!</h2>
         <div className="pet-container">
           {petNames.map((petName, index) => (
             <div className="pet-card" key={index}>
-              {/* <img src={`https://static.vecteezy.com/system/resources/thumbnails/005/857/332/small_2x/funny-portrait-of-cute-corgi-dog-outdoors-free-photo.jpg`} alt={petName} /> */}
+              {/* Use the corresponding index to get the image URL */}
+              <img src={petImages[index]} alt={petName} />
               <h3>{petName}</h3>
             </div>
           ))}
