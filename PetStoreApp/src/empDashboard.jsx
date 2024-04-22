@@ -34,25 +34,41 @@ function EmpDashboard() {
     setInsertFormVisible(false);
   };
 
-  const handleInsert = async (resourceNum, url) => {
+  const handleInsert = async () => {
     try {
+      // Get the resource number and URL
+      const num = resourceNum;
+      const url = document.getElementById('resource').value;
+  
+      // Check if the resource number already exists in the client-side state
+      const isResourceExists = resources.some(resource => resource.resourcenum === num);
+      if (isResourceExists) {
+        throw new Error('Resource number already exists. Try a different value.');
+      }
+  
       const response = await fetch(`http://${window.location.hostname}:5273/resources/insert`, {
         method: 'POST',
-        body: JSON.stringify({ resourceNum, url }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ resourceNum: num, url }),
       });
-      console.log(JSON.stringify({ resourceNum, url }))
   
       if (!response.ok) {
         throw new Error('Failed to insert resource');
       }
   
       // If insertion is successful, reload the page to reflect the changes
-      // window.location.reload();
+      window.location.reload();
     } catch (error) {
       console.error('Error inserting resource:', error.message);
       // Handle error - display an error message to the user or handle as needed
+      alert(error.message); // Display the error message to the user
     }
   };
+  
+  
+  
   
   
   const handleUpdate = async (id, currentUrl) => {
@@ -125,13 +141,14 @@ function EmpDashboard() {
 
       {/* Insert Form */}
       <div className={`form-popup ${insertFormVisible ? 'open' : ''}`} id="insertForm">
-        <form className="form-container">
-          <h2>Insert into resources:</h2>
-          <input type="text" id="resourceNum" name="resourceNum" value={resourceNum} onChange={(e) => setResourceNum(e.target.value)} placeholder="Resource Number" /><br /><br />
-          <input type="text" id="resource" name="resource" placeholder="Resource URL" /><br /><br />
-          <button type="submit" className="button" onClick={handleInsert}>Submit</button>
-          <button type="button" className="button cancel" onClick={closeInsertForm}>Close</button>
-        </form>
+      <form className="form-container" onSubmit={(e) => { e.preventDefault(); handleInsert(); }}>
+        <h2>Insert into resources:</h2>
+        <input type="text" id="resourceNum" name="resourceNum" value={resourceNum} onChange={(e) => setResourceNum(e.target.value)} placeholder="Resource Number" /><br /><br />
+        <input type="text" id="resource" name="resource" placeholder="Resource URL" /><br /><br />
+        <button type="submit" className="button">Submit</button> {/* Change button type to "submit" */}
+        <button type="button" className="button cancel" onClick={closeInsertForm}>Close</button>
+      </form>
+
       </div>
 
       {/* Resource Table */}
