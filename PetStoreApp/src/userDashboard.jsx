@@ -68,12 +68,20 @@ function UserDashboard() {
   // Function to fetch pets from the server
   const fetchPets = async () => {
     try {
-      const response = await fetch("http://localhost:5273/userDashboard/pets");
+      const response = await fetch('http://localhost:5273/pets');
       const data = await response.json();
-      setPetNames(data.petNames);
-      console.log(data.petNames);
+      console.log('Fetched pets data:', data); // Add this line to log the fetched data
+  
+      if (data && data.petsData && Array.isArray(data.petsData)) {
+        const petNamesArray = data.petsData.map(pet => pet.pname); // Assuming 'pname' is the property for pet name
+        const petImagesArray = data.petsData.map(pet => pet.imageurl); // Assuming 'imageURL' is the property for image URL
+        setPetNames(petNamesArray);
+        setPetImages(petImagesArray);
+      } else {
+        console.error('Invalid pets data format');
+      }
     } catch (error) {
-      console.error("Error fetching pets", error);
+      console.error('Error fetching pets', error);
     }
   };
 

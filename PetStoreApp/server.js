@@ -395,17 +395,22 @@ console.log("TEST");
 });
 
 
-app.get('/userDashboard/pets', async (req, res) => {
+app.get('/pets', async (req, res) => {
   try {
-    const result = await pool.query('SELECT pname FROM Pets');
-    const petNames = result.rows.map(row => row.pname);
-    res.json({ petNames });
-    console.log(res.json({ petNames }))
+    const result = await pool.query(`
+      SELECT p.pname, pi.imageURL
+      FROM pets p 
+      JOIN petImage_Belongs pi ON p.petid = pi.petid
+    `);
+    const petsData = result.rows;
+    res.json({ petsData });
   } catch (error) {
-    console.error('Error fetching pets', error);
+    console.error('Error fetching pets with images', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
 
 // Define endpoint to fetch the user's pet name with hardcoded user ID
 app.get('/adopt/:userid', async (req, res) => {
