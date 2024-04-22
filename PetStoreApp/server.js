@@ -2,6 +2,7 @@ import './dbConfig.js'
 import './databasepg.js'
 import { pool } from './dbConfig.js'
 import express from 'express';
+import session from 'express-session';
 import cors from 'cors'
 
 const app = express();
@@ -10,12 +11,14 @@ const PORT = 5273;
 app.set("view engine", "ejs")
 app.set('port',PORT)
 app.use(cors());
-app.use(express.urlencoded({ extended: false }))
-app.use(express.text())
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.text());
 app.use((req, res, next) => {
     res.header('Content-Type', 'text/plain');
     next();
 });
+
 async function sqlSelect(query){
   return new Promise((resolve, reject) => {
       pool.query(query, (err, result) => {
@@ -86,6 +89,7 @@ app.post('/modify', async(req, res) => {//can just use this for insert,update,de
   const data=await sqlModify(req.body);
   res.send(data);
 });
+
 app.get('/', (req, res) => {
     res.render('index')
 });
@@ -97,16 +101,14 @@ app.post('/register', async (req, res) => {
     console.log(registerData);
 
     // Extract user registration data from the parsed JSON object
-    const { userID, email, fname, lname, phonenumber, address } = registerData;
-    const values = [userID, email, fname, lname, phonenumber, address];
+    const { userID, password, email, fname, lname, phonenumber, address } = registerData;
+    const values = [userID, password, email, fname, lname, phonenumber, address];
     console.log(values);
-
-    // Perform any necessary data validation here
 
     // Insert the user data into the database
     const query = `
-      INSERT INTO users (userID, email, fname, lname, phonenumber, address)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO users (userID, password, email, fname, lname, phonenumber, address)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
     await pool.query(query, values);
 
@@ -119,30 +121,61 @@ app.post('/register', async (req, res) => {
   }
 });
 
-async function checkIfUsernameExists(username) {
+app.use(session({
+  secret: 'Oo6iCFWGj7Ip3GAjphCa2FFkm',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}));
+
+async function checkUser(username, password) {
   try {
-    // Query the database to check if the username exists
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [username]);
-    // If a row with the given username exists, return true; otherwise, return false
+    console.log(username)
+    console.log(password)
+    // Query the database to check if the username and password match
+    const result = await pool.query('SELECT * FROM Users WHERE Email = $1 AND password = $2', [username, password]);
+    // console.log(result)
+    // If a row with the given username and password exists, return true; otherwise, return false
+    console.log(result.rows.length > 0)
     return result.rows.length > 0;
   } catch (error) {
     // Log any errors that occur during the database query
-    console.error('Error checking if username exists:', error);
+    console.error('Error checking if user exists:', error);
     // Return false in case of an error or if the query fails
     return false;
   }
 }
 
-app.get('/checkUsername/:username', async (req, res) => {
+app.post('/checkUser', async (req, res) => {
   try {
-    const username = req.params.username;
-    // Query the database to check if the username exists
-    const userExists = await checkIfUsernameExists(username);
-    // Send JSON response based on whether the username exists or not
+    const { username, password } = req.body;
+    console.log(username)
+    console.log(password)
+    // Query the database to check if the username and password match
+    const userExists = await checkUser(username, password);
+    // if (userExists) {
+    //   // Set session data to indicate user is signed in
+    //   req.session.user = { username }; // You can store additional user data if needed
+    //   res.json({ success: true, message: 'User signed in successfully' });
+    // } else {
+    //   res.status(401).json({ success: false, message: 'Invalid username or password' });
+    // }
+    // Send JSON response based on whether the username and password match or not
     res.json({ exists: userExists });
   } catch (error) {
-    console.error('Error checking username:', error);
+    console.error('Error checking user:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/userDashboard', (req, res) => {
+  // Check if user session exists
+  if (req.session.user) {
+    // User is signed in, render the user dashboard
+    res.render('userDashboard', { username: req.session.user.username });
+  } else {
+    // User is not signed in, redirect to sign-in page or display appropriate message
+    res.redirect('/signin');
   }
 });
 
