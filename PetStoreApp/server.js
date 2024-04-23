@@ -3,8 +3,7 @@ import './databasepg.js'
 import { pool } from './dbConfig.js'
 import express from 'express';
 import session from 'express-session';
-import cors from 'cors'
-
+import cors from 'cors';
 const app = express();
 // import bcrypt from 'bcrypt';
 const PORT = 5273;
@@ -19,8 +18,14 @@ app.use((req, res, next) => {
     // res.header('Content-Type', 'text/plain');
     next();
 });
-
+app.use(session({
+    secret: 'Oo6iCFWGj7Ip3GAjphCa2FFkm',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}));
 async function sqlSelect(query){
+        //console.log("OUR QUERY IS THIS " + query);
         return new Promise((resolve, reject) => {
             pool.query(query, (err, result) => {
                 if (err) {
@@ -32,29 +37,6 @@ async function sqlSelect(query){
             });
         });
 }
-async function sqlModify(query){
-        return new Promise((resolve, reject) => {
-            pool.query(query, (err, result) => {
-                if (err) {
-                    console.error('Error', err);
-                    reject(err);
-                } else {
-                    resolve(1);
-                }
-            });
-        });
-  return new Promise((resolve, reject) => {
-      pool.query(query, (err, result) => {
-          if (err) {
-              console.error('Error', err);
-              reject(err);
-          } else {
-              resolve(result.rows);
-          }
-      });
-  });
-}
-
 
 async function sqlInsert(query){
     await pool.query(
@@ -109,6 +91,15 @@ app.post('/modify', async (req, res) => {//can just use this for insert,update,d
   const data=await sqlModify(req.body);
   res.send(data);
 });
+app.get('/get-user', function(req, res){
+    console.log("IS USER LG");
+    console.log(req.session.user);
+   if(req.session.user){
+      res.send({ user: req.session.user });
+   } else {
+      res.send({ user: null });
+   }
+});
 
 app.get('/', (req, res) => {
     res.render('index')
@@ -118,21 +109,7 @@ app.get('/', (req, res) => {
 the server can use req.session.user to get the user session id (this can be anything we want like email or the actual userID
 and we can wrap actions only for logged in users in:
 if (req.session.user){};
-
-
 */
-app.post('/login', async (req, res) => {
-  let userDetails=JSON.parse(req.body);
-  let result=0;//TODO: check and verify user
-  if (result){
-    req.session.user={
-        userID:"TODO",
-    }
-  }
-  else{
-    res.send(403,"Invalid Login!");
-  }
-}
 app.post('/register', async (req, res) => {
   try {
     // Parse the JSON data from the request body
@@ -229,6 +206,7 @@ app.post('/login', checkAuth, async (req, res, next) => {
 
     if (userExists) {
       req.session.user = { username };
+      console.log("LOG SESS");
       console.log(req.session.user);
       res.json({ success: true, message: 'User signed in successfully' });
     } else {
@@ -336,7 +314,7 @@ app.post('/users/register', async (req, res) => {
     let { name, email, password, password2 } = req.body;
     console.log({
         name, email, password, password2
-    })
+    });
 
     let errors = [];
 
@@ -350,7 +328,7 @@ app.post('/users/register', async (req, res) => {
 
     if (password != password2) {
         errors.push({message: "Passwords do not match"});
-    }
+    }});
 
 
 async function sqlSelectOrganizations() {
@@ -375,6 +353,46 @@ app.get('/organizations', async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Define endpoint to handle donation form submission
+app.post('/donate', async (req, res) => {
+  // Extract data from the request body
+  const { organization, amount, userid } = req.body;
+  try {
+      // Fetch the orgid based on the selected organization name
+      const orgResult = await pool.query(
+          `SELECT orgid FROM organizations WHERE name = $1`,
+          [organization]
+      );
+
+      // Check if organization exists
+      if (orgResult.rows.length === 0) {
+          return res.status(404).json({ error: 'Organization not found' });
+      }
+
+      const orgid = orgResult.rows[0].id;
+
+      // Log the data before inserting into the database
+      console.log('Data to be inserted into donations table:', { userid, orgid, amount });
+
+      // Perform SQL insert operation to add donation information to the database
+      const result = await pool.query(
+          `INSERT INTO donations (userid, orgid, amount) VALUES ($1, $2, $3)`,
+          [userid, orgid, amount]
+      );
+
+      // Log the inserted data
+      console.log('Donation submitted:', { userid, orgid, amount });
+
+      // Respond with success message
+      res.status(200).json({ message: 'Donation submitted successfully' });
+  } catch (error) {
+      // Handle errors
+      console.error('Error submitting donation:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 app.get('/pets', async (req, res) => {
   try {
@@ -488,13 +506,6 @@ app.post('/donate', async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to submit donation' });
   }
 });
-
-
-
-
-
-
-
 app.get('/organizations/:name', async (req, res) => {
   const orgName = req.params.name;
 
