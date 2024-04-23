@@ -116,9 +116,10 @@ function UserDashboard() {
       try {
       console.log("HELLO");
       console.log(username);
-        const response = await fetch(`http://localhost:5273/adopt/${username}`,
+        const response = await fetch(`http://localhost:5273/adopt/user001`,
         { credentials: 'include'});
         const data = await response.json();
+        console.log(data);
         setPetApplication(data);
         resolve();
       } catch (error) {
@@ -131,7 +132,7 @@ function UserDashboard() {
   // Function to fetch user details from the server
   const fetchUserDetails = async (username) => {
     try {
-      const response = await fetch(`http://localhost:5273/users/${username}`,
+      const response = await fetch(`http://localhost:5273/users/user001`,
                                                                                     { credentials: 'include'});
       const data = await response.json();
       const fullName = `${data.fname} ${data.lname}`;
@@ -147,7 +148,7 @@ function UserDashboard() {
     return new Promise(async (resolve, reject) => {
       try {
         const response = await fetch(
-          `http://localhost:5273/donations/${username}`,
+          `http://localhost:5273/donations/user001`,
                                                                { credentials: 'include'}
         );
         const data = await response.json();
@@ -283,7 +284,11 @@ function UserDashboard() {
         {petApplication ? (
           <div>
             <p>User Name: {userName}</p>
-            <p>Pet Name: {petApplication.pname}</p>
+            {petApplication.map((row, index) => (
+                              <div key={index}>
+                                <p>Pet Name: {row.pname}</p>
+                              </div>
+                            ))}
           </div>
         ) : (
           <p>No pet application found for {userName}</p>
