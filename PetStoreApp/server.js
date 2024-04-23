@@ -81,7 +81,27 @@ app.post('/select', async (req, res) => {
   res.send(values);
 });
 
+app.post('/adoptApplication', async (req, res) => {
+  // Replace this with the actual data you want to send.
+  let maxID = await sqlSelect("SELECT MAX(adoptid) FROM Adopt");
 
+  console.log("TEMP");
+  console.log(maxID);
+  maxID=Number (maxID[0].max);
+  console.log("OLD MAX IS " + maxID);
+  maxID+=1;
+  console.log("NEW MAX IS " + maxID);
+  let body=JSON.parse(req.body);
+  let query=`INSERT INTO ADOPT VALUES ('${body.user}','${body.pet}','${maxID}')`;
+  console.log(query);
+    const data=await sqlModify(query);
+    if (data==1){
+        res.send(200);
+    }
+    else{
+        res.send(403);
+    }
+});
 /*
     req.session.user={
         username:userDetails.Username

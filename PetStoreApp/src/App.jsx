@@ -25,8 +25,7 @@ const [user, setUser] = useState(null);
                   credentials: 'include'
                })
       .then(response => response.json())
-      .then(data=>console.log(data))
-      .then(data => setUser(data.user));
+      .then(data => setUser(data.user.username));
   }, []);
  const [petElements, setPetElements] = useState(null);
 
@@ -109,11 +108,38 @@ credentials: 'include',
       }).join(', ');
       return "(" + list + ")";
   }
-  function adoptAttempt(){
-    if (false){//if pet application exists already
-
+  async function adoptAttempt(id){
+    let query="SELECT * FROM Users Join Adopt On Adopt.userid=Users.userid Join Pets On Pets.petid=Adopt.petid WHERE Users.email='"+user+"' AND Pets.petid='" +id+"'" ;
+    let results=JSON.parse(await sqlResults(query));
+    console.log(results);
+    console.log(results.length);
+    if (results.length>0){//if pet application exists already
+        alert("You already filed an application for this pet!");
     }
     else{
+        query="SELECT userid FROM Users where email='"+user+"'";
+        let userID=JSON.parse(await sqlResults(query));
+        userID=userID[0][0];
+        console.log(userID);
+            var url="http://"+ window.location.hostname + ":"+PORT +'/adoptApplication';
+            var bodyJSON={user:userID,pet:id};
+            var bodyStr=JSON.stringify(bodyJSON);
+            const response = await fetch(url, {
+                method:"POST",
+                credentials: 'include',
+                headers: {
+                      'Content-Type': 'text/plain'
+                    },
+                body:bodyStr
+            });
+            let results = await response.text();
+            console.log(results);
+            if (results=='OK'){
+                alert("Application fulfilled!");
+            }
+            else{
+                alert("Error! Please try again.");
+            }
 
     }
   }
@@ -127,7 +153,7 @@ async function processResults(results){
                 return (
                     <div key={index}>{result[1]}
                         <img></img>
-                        <button disabled={user? false:true} onClick={()=>adoptAttempt()}>Adopt!</button>
+                        <button disabled={user? false:true} onClick={()=>adoptAttempt(result[0])}>Adopt!</button>
                         <br />
                     </div>
 
