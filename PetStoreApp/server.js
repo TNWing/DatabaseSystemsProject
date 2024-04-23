@@ -366,45 +366,6 @@ app.get('/organizations', async (req, res) => {
   }
 });
 
-// Define endpoint to handle donation form submission
-app.post('/donate', async (req, res) => {
-  // Extract data from the request body
-  const { organization, amount, userid } = req.body;
-  try {
-      // Fetch the orgid based on the selected organization name
-      const orgResult = await pool.query(
-          `SELECT orgid FROM organizations WHERE name = $1`,
-          [organization]
-      );
-
-      // Check if organization exists
-      if (orgResult.rows.length === 0) {
-          return res.status(404).json({ error: 'Organization not found' });
-      }
-
-      const orgid = orgResult.rows[0].id;
-
-      // Log the data before inserting into the database
-      console.log('Data to be inserted into donations table:', { userid, orgid, amount });
-
-      // Perform SQL insert operation to add donation information to the database
-      const result = await pool.query(
-          `INSERT INTO donations (userid, orgid, amount) VALUES ($1, $2, $3)`,
-          [userid, orgid, amount]
-      );
-
-      // Log the inserted data
-      console.log('Donation submitted:', { userid, orgid, amount });
-
-      // Respond with success message
-      res.status(200).json({ message: 'Donation submitted successfully' });
-  } catch (error) {
-      // Handle errors
-      console.error('Error submitting donation:', error);
-      res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
 
 app.get('/pets', async (req, res) => {
   try {
@@ -423,12 +384,11 @@ app.get('/pets', async (req, res) => {
 
 // Define endpoint to fetch the user's pet name with hardcoded user ID
 app.get('/adopt/:userid', async (req, res) => {
-  // Hardcoded user ID
-  console.log("HELLO un");
-    console.log(req.session.user);
-    console.log("bye un");
+  const userid = 'user001'; // Hardcoded user ID
+
   try {
       // Execute the SQL query to fetch the user's pet name
+
       const result = await pool.query(
           `SELECT u.userid, p.pname
           FROM adopt a
@@ -437,13 +397,16 @@ app.get('/adopt/:userid', async (req, res) => {
           WHERE u.userid = $1`,
           [userid]
       );
+            /*const result = await pool.query(
+                "SELECT u.userid, p.pname FROM adopt a JOIN pets p ON a.petid = p.petid JOIN users u ON a.userid = u.userid WHERE u.userid = 'user001'"
+            );*/
       if (result.rows.length === 0) {
           // If no pet is found for the given user, return a 404 status code
           return res.status(404).json({ error: 'User or pet not found' });
       }
-
+    console.log("ADOPT LST");
       // Return the user's pet details
-      const userPet = result.rows[0];
+      const userPet = result.rows;
       console.log(userPet);
       res.json(userPet);
   } catch (error) {
@@ -452,12 +415,11 @@ app.get('/adopt/:userid', async (req, res) => {
   }
 });
 
-// Define endpoint to fetch user details by user ID
 app.get('/users/:userid', async (req, res) => {
   const { userid } = req.params;
 
   try {
-    const result = await pool.query('SELECT fname, lname FROM users WHERE email = $1', [userid]);
+    const result = await pool.query('SELECT fname, lname FROM users WHERE userid = $1', [userid]);
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
