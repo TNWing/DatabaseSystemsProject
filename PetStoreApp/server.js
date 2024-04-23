@@ -214,7 +214,7 @@ app.post('/login', checkAuth, async (req, res, next) => {
     const userExists = result.rows.length > 0;
 
     if (userExists) {
-      req.session.user = { userID:username };
+      req.session.user = { username };
       console.log("LOG SESS");
       console.log(req.session.user);
     req.session.save(() => {console.log("SAVED");
