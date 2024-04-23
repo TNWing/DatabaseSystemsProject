@@ -93,6 +93,7 @@ const Register = (props) => {
 
     const requestBody = {
       userID,
+      password,
       email,
       fname,
       lname,

@@ -130,3 +130,36 @@ input[type='button'] {
 }
 
 /* Optionally, you can add more custom styling for the form elements */
+.resources-page {
+  background-color: #f2f2f2; /* Set background color */
+  min-height: 100vh; /* Ensure content takes at least full height of viewport */
+  padding: 40px;
+}
+
+.resources-content {
+  margin-top: 20px;
+}
+
+.resource-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.resource-table th,
+.resource-table td {
+  padding: 100px;
+  border-bottom: 1px solid #ddd;
+}
+
+.resource-table th {
+  background-color: #333;
+  color: #fff;
+}
+
+.resource-table td {
+  background-color: #fff;
+}
+
+.resource-table tr:nth-child(even) td {
+  background-color: #f2f2f2;
+}
