@@ -23,6 +23,7 @@ app.use(session({
     cookie: { secure: false }
 }));
 async function sqlSelect(query){
+        //console.log("OUR QUERY IS THIS " + query);
         return new Promise((resolve, reject) => {
             pool.query(query, (err, result) => {
                 if (err) {
@@ -85,6 +86,13 @@ app.post('/modify', async (req, res) => {//can just use this for insert,update,d
   // Replace this with the actual data you want to send.
   const data=await sqlModify(req.body);
   res.send(data);
+});
+app.get('/get-user', function(req, res){
+   if(req.session.user){
+      res.send({ user: req.session.user });
+   } else {
+      res.send({ user: null });
+   }
 });
 app.get('/', (req, res) => {
     res.render('index')
