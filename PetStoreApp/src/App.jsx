@@ -10,36 +10,53 @@ const PORT= 5273;
 const [hasFetched, setHasFetched] = useState(false);
 const [isInit,setInit]=useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
 const [petResult, setPets] = useState(null); // Initialize results with sqlResults()
 const [availableSpecies, setAvailableSpecies] = useState([]);
-const filterMap=new Map();
-const breedMap=new Map();//stores all breeds per species
-let isUserLoggedIn=false;
+const [filterMap,setFilterMap]=useState(new Map());
+const [breedMap,setBreedMap]=useState(new Map());
+const [user, setUser] = useState(null);
+
+  useEffect(() => {
+   var url="http://"+ window.location.hostname + ":"+PORT +'/get-user';
+   console.log("GETTNG USER");
+    fetch(url, {
+                   method:"GET",
+               })
+      .then(response => response.json())
+      .then(data=>console.log(data))
+      .then(data => setUser(data.user));
+  }, []);
  const [petElements, setPetElements] = useState(null);
+
+ async function initMap(){
+    let tempMap=new Map();
+    tempMap.set('Species',[]);
+    tempMap.set('Breeds',[]);
+    setFilterMap(tempMap);
+
+ }
  useEffect(() => {
      const fetchDataAndThenGetSpecies = async () => {
          await fetchData();
+         await getSpecies();
+         await initMap();
          if (availableSpecies.length>0){
              await getSpecies();
          }
      };
-
      fetchDataAndThenGetSpecies();
  }, []); // This effect runs once on mount
-
- useEffect(() => {
-     if (availableSpecies.length>0) {
-       console.log("HERE" + availableSpecies + "PR");
-         getSpecies();
-     }
- }, [availableSpecies]); // This effect runs when availableSpecies or sqlResults is updated
 useEffect(() => {
     if (petResult) {
-
+    console.log("WHY IS THIS CALLED");
         updatePets();
     }
 }, [petResult]); // This effect runs when petResult is updated
+useEffect(() => {
 
+    updateAdoptionFilters();
+}, [filterMap]); // This effect runs when petResult is updated
     async function fetchData() {
         let queryResults=await sqlResults("SELECT * FROM Pets");
         console.log(JSON.parse(queryResults));
@@ -63,12 +80,11 @@ filter map key_values
 Species->array of species to include, if empty, then include all
 Breeds->array of breeds to include. must use the breedMap to see if any breeds of that species is filtered
 */
-    let isLoggedIn=false;
+
 const filterEnabled=false;
 async function sqlResults(sqlQuery) {
     var url="http://"+ window.location.hostname + ":"+PORT +'/select';
-    //http://localhost:5173/
-    console.log("FETCHING");
+    console.log(sqlQuery +" is our query");
     const response = await fetch(url, {
         method:"POST",
         headers: {
@@ -91,7 +107,7 @@ async function sqlResults(sqlQuery) {
       return "(" + list + ")";
   }
   function adoptAttempt(){
-    if (false){
+    if (false){//if pet application exists already
 
     }
     else{
@@ -103,14 +119,12 @@ async function sqlResults(sqlQuery) {
 async function processResults(results){
     return new Promise((resolve, reject) => {
         try {
-        console.log(results);
             let processedResults = results.map((result, index) => {
                 //TODO
-                console.log(result);
                 return (
                     <div key={index}>{result[1]}
                         <img></img>
-                        <button disabled={isUserLoggedIn? false :true} onClick={()=>adoptAttempt()}>Adopt!</button>
+                        <button disabled={user? false:true} onClick={()=>adoptAttempt()}>Adopt!</button>
                         <br />
                     </div>
 
@@ -131,11 +145,17 @@ async function processResults(results){
       var speciesArr=filterMap.get('Species');
       var conds=[];
       var petArr=[];
-      if (speciesArr.length>0){
+      /*
+      setPets(JSON.parse(queryResults))
+      */
+      console.log(filterMap);
+      if (filterMap.has('Species') && speciesArr.length>0){
 
-          for(let i=0;i<speciesArr;i++){
+          for(let i=0;i<speciesArr.length;i++){
+          var query="";
             var breedArr=[];
             let sB=breedMap.get(speciesArr[i]);
+            console.log("HEY OUR SB IS " + sB);
             if (sB.length>0){
                 let noBreedRestrict=true;
                 for (let b=0;b<sB.length;b++){
@@ -145,51 +165,74 @@ async function processResults(results){
                         breedArr.push(sB[b]);
                     }
                 }
-                var query="";
+
                 if (noBreedRestrict){
-                    query="SELECT * FROM Pets WHERE species =" + speciesArr[i];
+                    console.log("NO BREED FILTER");
+                    // SELECT * FROM Pets INNER JOIN Breed_Species_Relationship ON Pets.petID=Breed_Species_Relationship.petID INNER JOIN Species On Species.speciesID=Breed_Species_Relationship.speciesID
+                    console.log(speciesArr[i]);
+                    query="SELECT * FROM Pets INNER JOIN Breed_Species_Relationship ON Pets.petID=Breed_Species_Relationship.petID INNER JOIN Species On Species.speciesID=Breed_Species_Relationship.speciesID WHERE Species.sname ='" + speciesArr[i]+"'";
                 }
                 else{
+                    console.log("BREED FILTER");
                     query="  SELECT * FROM Pets "
-                    +"INNER JOIN Is_Breed_Type ON Pets.petID=Is_Breed_Type.petID INNER JOIN Breed ON Is_Breed_Type.breedID = Breed.breedID"
+                    +"INNER JOIN Is_Breed_Type ON Pets.petID=Is_Breed_Type.petID INNER JOIN Breed ON Is_Breed_Type.breedID = Breed.breedID "
+                    //+"INNER JOIN Breed On PetImage_Belongs.imageid=Breed.breedID "
                     +"where Bname IN " + arrToList(breedArr);
                 }
-                await sqlResults(filterQuery).then(results=>{console.log(results);});
             }
             else{
-                var query="SELECT * FROM Pets WHERE species =" + speciesArr[i];
-                await sqlResults(filterQuery).then(results=>{console.log(results);});
+                console.log("NO BREEDS AT ALL");
+                query="SELECT * FROM Pets INNER JOIN Breed_Species_Relationship ON Pets.petID=Breed_Species_Relationship.petID INNER JOIN Species On Species.speciesID=Breed_Species_Relationship.speciesID WHERE Species.sname ='" + speciesArr[i]+"'";
+
                 //may need to flatten/iterate thr the results to append to my petArr
             }
-
+            await sqlResults(query).then(results => {
+                let resultsArr = JSON.parse(results);
+                resultsArr.forEach(subArr => {
+                    petArr.push(subArr);
+                });
+            });
           }
 
       }
-      processResults(petArr);
+      else{
+        var  query="SELECT * FROM Pets";
+         await sqlResults(query).then(results => {
+                        let resultsArr = JSON.parse(results);
+                        resultsArr.forEach(subArr => {
+                            petArr.push(subArr);
+                        });
+                    });
+      }
+      setPets(petArr);
   }
 
-function setFilters(type,filterName){
-    if (filterMap.get(type).find((element) => element==filterName)){
-        index=filterMap.get(type).indexOf(filterName)
-        filterMap.get(type).splice(index, 1);
+async function setFilters(type,filterName){
+    console.log("FILTER TYPE,Name" + type +","+ filterName);
+    let tempMap=new Map(filterMap);
+    if (tempMap.get(type).find((element) => element==filterName)){
+        let index=tempMap.get(type).indexOf(filterName)
+        tempMap.get(type).splice(index, 1);
+        if (type=="Species"){
+            //remove any breeds associated with that filter
+        }
     }
     else{
-        filterMap.get(type).push(filterName);
+        tempMap.get(type).push(filterName);
     }
-    if (type=="Species"){
-        //if ()
-    }
+
+    setFilterMap(tempMap);
+
     //then, show breeds based on species filter
     //each species shoudl
     //updateAdoptionFilters();
 }
 
-function resetFilters(){
-    filterMap.clear();
+async function resetFilters(){
+    //filterMap.clear();
+    await initMap();
     //updateAdoptionFilters();
 }
-
-
 
 
   async function flattenArr(arrToConvert){
@@ -200,26 +243,31 @@ function resetFilters(){
     return result;
   }
   async function getSpecies() {
+        console.log(availableSpecies.length);
        if (availableSpecies.length === 0) {
            var query = "SELECT sname FROM Species";
            const results = await sqlResults(query);
            const species = await flattenArr(JSON.parse(results));
-           setAvailableSpecies(species);
+           setAvailableSpecies(species);;
+           console.log(filterMap.get('Species'));
+           let tempMap=new Map(breedMap);
            //for each species, load the breeds for each
            for (let i=0;i<species.length;i++){
+
             var breeds=await getBreeds(species[i]);
-            breedMap.set(species[i],breeds);
+            tempMap.set(species[i],breeds);
            }
+           setBreedMap(tempMap);
        }
    };
 
  async function getBreeds(speciesName) {
-    var query=`SELECT Bname FROM Breed_Species_Relationship,Breed WHERE Breed_Species_Relationship.breedID = Breed.breedID AND Breed.Bname=${speciesName}`;
+    var query=`SELECT Bname FROM Breed_Species_Relationship,Breed,Species WHERE Breed_Species_Relationship.breedID = Breed.breedID AND  Breed_Species_Relationship.speciesID = Species.speciesIDSpecies.sname=${speciesName}`;
+    query=`SELECT Breed.Bname from Breed Join Breed_Species_Relationship on Breed.breedID=Breed_Species_Relationship.breedID join Species on Species.speciesID=Breed_Species_Relationship.speciesID WHERE Species.Sname='${speciesName}'`;
      var results = await sqlResults(query);
      var breeds = await flattenArr(JSON.parse(results));
      return breeds;
  };
-
 
   return (
     <div>
@@ -313,32 +361,38 @@ function resetFilters(){
             <div className="filter_parent" onClick={()=>openFilters()}>Filters
 
                 </div>
-                {isOpen && (<div className="filter_body" id="filter_body">
-                                            <div className="hover_parent" id="filter_species">
+{isOpen && (<div className="filter_body" id="filter_body">
+                                            <div className="hover_parent" id="filter_species" style={{height: '200px' ,width:'450px',maxHeight: '150px', overflowY: 'scroll' }}>
                                                 Species
-                                                        <div id="species_child_container">
+                                                        <div className="hover_child_container" id="species_child_container">
                                                             {availableSpecies.map((species, i) => (
-                                                                <div key={i} onClick={() => setFilters('Species', species)}>
+                                                                <div key={i} onClick={(e) => { console.log(e.target);console.log(e.currentTarget);if (e.target === e.currentTarget) setFilters('Species', species);}}>
                                                                     {species}
-                                                                        <div className="filter_type hover_parent" id="filter_breed">
-                                                                        Breeds
-                                                                            {speciesArray.map((item, index) => (
-                                                                             <div key={index} onClick={() => setFilters('Breeds', 'name')}>{item} </div>
-                                                                            ))}
+                                                                    <br/>
+                                                                        <div className="filter_type hover_parent2" id="filter_breed">
+                                                                       {breedMap.has(species) && breedMap.get(species).length>0 &&  filterMap.get('Species').includes(species) &&(
+                                                                           <React.Fragment>
+                                                                            <div style={{width: '300px' ,maxHeight: '100px', overflowY: 'scroll' }}>
+                                                                               <div>Breeds</div>
+                                                                               {breedMap.get(species).map((item, index) => (
+
+                                                                                   <React.Fragment key={index}>
+                                                                                       <div style={{ marginLeft:'15px',marginBottom: '7px' }} onClick={(e) => {e.preventDefault();  e.stopPropagation(); setFilters('Breeds', item);}}>
+                                                                                           {item}
+                                                                                       </div>
+
+                                                                                   </React.Fragment>
+                                                                               ))}
+                                                                               </div>
+                                                                           </React.Fragment>
+                                                                       )}
+
                                                                         </div>
                                                                 </div>
                                                             ))}
                                                         </div>
                                             </div>
-                                            <div className="hover_parent" id="filter_breed">
-                                                Breeds
-                                                <div className="hover_child_container" id="breed_child_container">
 
-                                                </div>
-                                            </div>
-                                            <div className="hover_parent" id="filter_age">
-                                                <div id="slider-vertical" style={{height: '200px'}}></div>
-                                            </div>
                                         </div>
                                     )}
 

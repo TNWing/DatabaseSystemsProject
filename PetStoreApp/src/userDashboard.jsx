@@ -110,6 +110,8 @@ function UserDashboard() {
   const fetchPetApplication = async (username) => {
     return new Promise(async (resolve, reject) => {
       try {
+      console.log("HELLO");
+      console.log(username);
         const response = await fetch(`http://localhost:5273/adopt/${username}`);
         const data = await response.json();
         setPetApplication(data);
