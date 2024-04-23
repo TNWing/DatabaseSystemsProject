@@ -42,3 +42,7 @@ const rootElement = document.getElementById('root');
 ReactDOM.createRoot(rootElement).render(
     <Main />
 );
+
+createRoot(rootElement).render(
+    <Main />
+);
