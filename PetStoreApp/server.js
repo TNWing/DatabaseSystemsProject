@@ -11,6 +11,14 @@ const PORT = 5273;
 app.set("view engine", "ejs")
 app.set('port',PORT)
 app.use(cors());
+
+app.use(session({
+  secret: 'Oo6iCFWGj7Ip3GAjphCa2FFkm',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.text());
@@ -132,13 +140,6 @@ app.post('/register', async (req, res) => {
 });
 
 
-app.use(session({
-  secret: 'Oo6iCFWGj7Ip3GAjphCa2FFkm',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false }
-}));
-
 app.use((err, req, res, next) => {
   console.error('Error:', err);
   res.status(500).json({ error: 'Internal server error' });
@@ -184,11 +185,15 @@ app.get('/userDashboard/:userid', redirectLogin, (req, res, next) => {
 
 // Route for checking user credentials
 app.post('/login', checkAuth, async (req, res, next) => {
+  req.session.user = { username: 'ben@gmail.com' }; // Set user data in session
+  res.json({ success: true, message: 'User signed in successfully' });
   try {
     const { username, password } = req.body;
     const result = await pool.query('SELECT * FROM Users WHERE Email = $1 AND password = $2', [username, password]);
     const userExists = result.rows.length > 0;
-
+    console.log('Request Body:', req.body);
+    console.log('Session Data:', req.session);
+    // console.log(req.session.user)
     if (userExists) {
       req.session.user = { username };
       console.log(req.session.user);
