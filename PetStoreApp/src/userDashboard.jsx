@@ -12,6 +12,7 @@ function UserDashboard() {
   const [petApplication, setPetApplication] = useState(null);
   const [userName, setUserName] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
+  const [logoutStatus, setLogoutStatus] = useState(null);
   const [userDonations, setUserDonations] = useState([]);
   const [petImages, setPetImages] = useState([]);
 
@@ -57,8 +58,7 @@ function UserDashboard() {
       console.error('Error submitting donation:', error.message);
     }
   };
-  
-  
+
   // Define function to fetch data from the server
   // const fetchData = async() => {
   //   return new Promise(async (resolve, reject) => {
@@ -163,41 +163,7 @@ function UserDashboard() {
   // const [fname, setFname] = useState(""); // State to store the first name
 
   useEffect(() => {
-    fetch('/checkLoggedIn')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.text(); // Get response body as text
-      })
-      .then(data => {
-        if (data.startsWith('{')) {
-          // Check if the response data starts with '{', indicating it's likely JSON
-          try {
-            const jsonData = JSON.parse(data); // Parse JSON from text
-            if (jsonData.loggedIn) {
-              setLoggedIn(true);
-              setUserName(jsonData.username); // Set username if logged in
-            } else {
-              setLoggedIn(false);
-              setUserName(""); // Clear username if not logged in
-            }
-          } catch (error) {
-            console.error('Error parsing JSON:', error);
-            // Handle JSON parsing error
-          }
-        } else {
-          console.error('Response is not JSON:', data);
-          // Handle case where response is not JSON
-        }
-      })
-      .catch(error => {
-        console.error('Error checking if user is logged in:', error.message);
-        // Handle other errors
-      });
-  }, []);
-
-  useEffect(() => {
+    // Check if req.user is defined to determine if the user is logged in
     if (loggedIn) {
       // Fetch data for the logged-in user
       fetchData(userName)
@@ -208,7 +174,7 @@ function UserDashboard() {
           console.error("Error fetching data:", error);
         });
     }
-  }, [loggedIn, userName]);
+  }, [loggedIn, userName]);  
 
   // UseEffect hook to fetch data when the component mounts
   useEffect(() => {
@@ -237,6 +203,27 @@ function UserDashboard() {
     });
   };
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/logout', {
+        method: 'POST',
+        credentials: 'include', // Include credentials (e.g., cookies) in the request
+      });
+      const data = await response.json();
+      if (response.ok) {
+        // If logout is successful
+        setLogoutStatus({ success: true, message: data.message });
+      } else {
+        // If logout fails
+        setLogoutStatus({ success: false, message: data.message });
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+      setLogoutStatus({ success: false, message: 'Logout failed' });
+    }
+  };
+
+
   // Render the UI
   return (
     <div className="container">
@@ -252,6 +239,12 @@ function UserDashboard() {
       {/*Donate buttons */}
       <div className="section">
         <button className="button" onClick={openDonateForm}>Donate</button>
+        <button className="button" onClick={handleLogout}>Logout</button>
+        {logoutStatus && (
+          <div>
+            <p>{logoutStatus.message}</p>
+          </div>
+        )}
       </div>
 
       {/* Donate Form */}

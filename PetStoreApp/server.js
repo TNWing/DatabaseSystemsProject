@@ -15,8 +15,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.text());
 app.use((req, res, next) => {
-    res.setHeader('Content-Type', 'application/json');
-    // res.setHeader('Accept', 'application/json');
+    res.header('Content-Type', 'application/json');
+    // res.header('Content-Type', 'text/plain');
     next();
 });
 
@@ -103,14 +103,23 @@ app.post('/register', async (req, res) => {
 
     // Extract user registration data from the parsed JSON object
     const { userID, password, email, fname, lname, phonenumber, address } = registerData;
-    const values = [userID, password, email, fname, lname, phonenumber, address];
-    console.log(values);
+    
+    // Check if the email is already registered
+    const emailCheckQuery = `
+      SELECT * FROM users WHERE email = $1
+    `;
+    const emailCheckResult = await pool.query(emailCheckQuery, [email]);
+    if (emailCheckResult.rows.length > 0) {
+      // Email already exists in the database
+      return res.status(400).json({ success: false, message: 'Email already registered' });
+    }
 
     // Insert the user data into the database
     const query = `
       INSERT INTO users (userID, password, email, fname, lname, phonenumber, address)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
+    const values = [userID, password, email, fname, lname, phonenumber, address];
     await pool.query(query, values);
 
     // Send success response
@@ -122,10 +131,11 @@ app.post('/register', async (req, res) => {
   }
 });
 
+
 app.use(session({
   secret: 'Oo6iCFWGj7Ip3GAjphCa2FFkm',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: { secure: false }
 }));
 
@@ -143,19 +153,37 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/checkLoggedIn', (req, res) => {
-  if (req.session && req.session.user) {
-    const { username } = req.session.user;
-    console.log(username)
-    res.status(200).json({ loggedIn: true, username }); // Return JSON response for logged-in user
+// middleware function to check if the user is logged in, if not --> login
+const redirectLogin = (req, res, next) => {
+  // Check if user is logged in 
+  console.log(req.session.user)
+  if (!req.session.user) {
+    res.redirect('/')
   } else {
-    res.status(401).json({ loggedIn: false, message: 'User is not logged in' }); // Return JSON error response for not logged-in user
+    next();
   }
+};
+
+const checkAuth = (req, res, next) => {
+  // Check if user is logged in 
+  console.log(req.session.user)
+  if (req.session.user) {
+    res.redirect('/login')
+  } else {
+    next();
+  }
+};
+
+// Apply checkAuth middleware to routes that require authentication
+app.get('/userDashboard/:userid', redirectLogin, (req, res, next) => {
+  // Route handler logic goes here
+  res.render('userDashboard', { username: req.user.username });
+  console.log(username)
 });
 
 
 // Route for checking user credentials
-app.post('/checkUser', async (req, res, next) => {
+app.post('/login', checkAuth, async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const result = await pool.query('SELECT * FROM Users WHERE Email = $1 AND password = $2', [username, password]);
@@ -172,28 +200,6 @@ app.post('/checkUser', async (req, res, next) => {
     next(error); // Pass the error to the error handling middleware
   }
 });
-
-// Route for fetching user dashboard
-app.get('/userDashboard/:userid', (req, res, next) => {
-  if (req.session.user) {
-    res.render('userDashboard', { username: req.session.user.username });
-  } else {
-    res.redirect('/signin');
-  }
-});
-
-// app.get('/userDashboard/:userid', (req, res) => {
-//   // Check if user session exists
-//   if (req.session.user) {
-//     // User is signed in, render the user dashboard
-//     console.log('User session exists. Rendering userDashboard:', req.session.user);
-//     res.render('userDashboard', { username: req.session.user.username });
-//   } else {
-//     // User is not signed in, redirect to sign-in page or display appropriate message
-//     console.log('User session does not exist. Redirecting to signin page.');
-//     res.redirect('/signin');
-//   }
-// });
 
 
 app.get('/resources', async (req, res) => {
@@ -235,7 +241,7 @@ app.delete('/resources/:id', async (req, res) => {
   }
 });
 
-app.put('/empDashboard/:id', async (req, res) => {
+app.put('/empDashboard/:id', redirectLogin, async (req, res) => {
   const resourceId = req.params.id;
   const { url } = req.body;
   console.log(resourceId)
@@ -255,6 +261,24 @@ app.put('/empDashboard/:id', async (req, res) => {
   }
 });
 
+app.post('/logout', redirectLogin, async (req, res) => {
+  try {
+    // Clear the user's session
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Error destroying session:', err);
+        return res.status(500).json({ success: false, message: 'Logout failed' });
+      }
+      console.log('User logged out successfully');
+      res.status(200).json({ success: true, message: 'Logout successful' });
+    });
+  } catch (error) {
+    console.error('Error logging out user:', error);
+    res.status(500).json({ success: false, message: 'Logout failed' });
+  }
+});
+
+
 app.post('/resources/insert', async (req, res) => {
   const { resourceNum, url } = req.body;
   console.log(url)
@@ -270,50 +294,7 @@ app.post('/resources/insert', async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to insert resource' });
   }
 });
-app.post('/users/register', async (req, res) => {
-    let { name, email, password, password2 } = req.body;
 
-    console.log({
-        name, email, password, password2
-    })
-
-    let errors = [];
-
-    if (!name ||!email ||!password ||!password2) {
-        errors.push({message: "Please fill all fields"});
-    }
-
-    if (password.length < 6) {
-        errors.push({message: "Your password must be longer than 6 characters"});
-    }
-
-    if (password != password2) {
-        errors.push({message: "Passwords do not match"});
-    }
-
-    if(errors.length > 0) {
-        res.render("register", {errors})
-    } else {
-        // Form validation passed
-        let hashedPassword = await bcrypt.hash(password, 10);
-        console.log(hashedPassword);
-
-        // pool.query(
-        //     `SELECT * FROM users WHERE email = $1`,
-        //     [email],
-        //     (err, results) => {
-        //         if (err) {
-        //             throw err;
-        //         }
-        //         console.log(results.rows);
-        //         if (results.rows.length > 0){
-        //             errors.push({ message: "Email already registered"});
-        //             res.render('register', { errors })
-        //         }
-        //     }
-        // )
-    }
-})
 
 async function sqlSelectOrganizations() {
   return new Promise((resolve, reject) => {
