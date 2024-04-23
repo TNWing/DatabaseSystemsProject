@@ -39,8 +39,10 @@ function Navbar() {
     try {
       const response = await fetch(`http://${window.location.hostname}:${PORT}/login`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+
         },
         body: JSON.stringify({ username, password }),
       });

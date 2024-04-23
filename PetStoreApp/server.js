@@ -9,7 +9,7 @@ const app = express();
 const PORT = 5273;
 app.set("view engine", "ejs")
 app.set('port',PORT)
-app.use(cors());
+app.use(cors({credentials:true,origin: 'http://localhost:5173'}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.text());
@@ -22,7 +22,8 @@ app.use(session({
     secret: 'Oo6iCFWGj7Ip3GAjphCa2FFkm',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }
+
+    cookie: { secure: false,sameSite:'lax'}
 }));
 async function sqlSelect(query){
         //console.log("OUR QUERY IS THIS " + query);
@@ -161,12 +162,6 @@ app.post('/register', async (req, res) => {
 });
 
 
-app.use(session({
-  secret: 'Oo6iCFWGj7Ip3GAjphCa2FFkm',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false }
-}));
 
 app.use((err, req, res, next) => {
   console.error('Error:', err);
@@ -219,10 +214,12 @@ app.post('/login', checkAuth, async (req, res, next) => {
     const userExists = result.rows.length > 0;
 
     if (userExists) {
-      req.session.user = { username };
+      req.session.user = { userID:username };
       console.log("LOG SESS");
       console.log(req.session.user);
-      res.json({ success: true, message: 'User signed in successfully' });
+    req.session.save(() => {console.log("SAVED");
+        res.json({ success: true, message: 'User signed in successfully' });
+    });
     } else {
       res.status(401).json({ success: false, message: 'Invalid username or password' });
     }
@@ -407,7 +404,9 @@ app.get('/pets', async (req, res) => {
 // Define endpoint to fetch the user's pet name with hardcoded user ID
 app.get('/adopt/:userid', async (req, res) => {
   // Hardcoded user ID
-
+  console.log("HELLO un");
+    console.log(req.session.user);
+    console.log("bye un");
   try {
       // Execute the SQL query to fetch the user's pet name
       const result = await pool.query(

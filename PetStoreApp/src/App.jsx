@@ -22,6 +22,7 @@ const [user, setUser] = useState(null);
    console.log("GETTNG USER");
     fetch(url, {
                    method:"GET",
+                  credentials: 'include'
                })
       .then(response => response.json())
       .then(data=>console.log(data))
@@ -87,6 +88,8 @@ async function sqlResults(sqlQuery) {
     console.log(sqlQuery +" is our query");
     const response = await fetch(url, {
         method:"POST",
+
+credentials: 'include',
         headers: {
               'Content-Type': 'text/plain'
             },

@@ -26,7 +26,8 @@ function UserDashboard() {
   
     try {
       // Fetch org_id using the organization name from the backend endpoint
-      const orgIdResponse = await fetch(`http://localhost:5273/organizations/${organizationName}`);
+      const orgIdResponse = await fetch(`http://localhost:5273/organizations/${organizationName}`,
+                                                                                                         { credentials: 'include'});
       if (!orgIdResponse.ok) {
         throw new Error(`Organization '${organizationName}' not found`);
       }
@@ -37,6 +38,7 @@ function UserDashboard() {
       // Submit the donation with the retrieved org_id
       const donationResponse = await fetch('http://localhost:5273/donate', {
         method: 'POST',
+      credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -77,7 +79,8 @@ function UserDashboard() {
 
   const fetchOrganizations = async () => {
     try {
-      const response = await fetch('http://localhost:5273/organizations');
+      const response = await fetch('http://localhost:5273/organizations',
+                                                                                { credentials: 'include'});
       const data = await response.json();
       setOrganizations(data.organizations);
     } catch (error) {
@@ -87,7 +90,8 @@ function UserDashboard() {
 
   const fetchPets = async () => {
     try {
-      const response = await fetch('http://localhost:5273/pets');
+      const response = await fetch('http://localhost:5273/pets',
+                                                                       { credentials: 'include'});
       const data = await response.json();
       console.log('Fetched pets data:', data); // Add this line to log the fetched data
   
@@ -112,7 +116,8 @@ function UserDashboard() {
       try {
       console.log("HELLO");
       console.log(username);
-        const response = await fetch(`http://localhost:5273/adopt/${username}`);
+        const response = await fetch(`http://localhost:5273/adopt/${username}`,
+        { credentials: 'include'});
         const data = await response.json();
         setPetApplication(data);
         resolve();
@@ -126,7 +131,8 @@ function UserDashboard() {
   // Function to fetch user details from the server
   const fetchUserDetails = async (username) => {
     try {
-      const response = await fetch(`http://localhost:5273/users/${username}`);
+      const response = await fetch(`http://localhost:5273/users/${username}`,
+                                                                                    { credentials: 'include'});
       const data = await response.json();
       const fullName = `${data.fname} ${data.lname}`;
       console.log(fullName)
@@ -141,7 +147,8 @@ function UserDashboard() {
     return new Promise(async (resolve, reject) => {
       try {
         const response = await fetch(
-          `http://localhost:5273/donations/${username}`
+          `http://localhost:5273/donations/${username}`,
+                                                               { credentials: 'include'}
         );
         const data = await response.json();
         setUserDonations(data.donations);
