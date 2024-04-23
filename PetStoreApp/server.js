@@ -132,7 +132,8 @@ app.post('/login', async (req, res) => {
   else{
     res.send(403,"Invalid Login!");
   }
-}
+});
+
 app.post('/register', async (req, res) => {
   try {
     // Parse the JSON data from the request body
@@ -332,25 +333,6 @@ app.post('/resources/insert', async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to insert resource' });
   }
 });
-app.post('/users/register', async (req, res) => {
-    let { name, email, password, password2 } = req.body;
-    console.log({
-        name, email, password, password2
-    })
-
-    let errors = [];
-
-    if (!name ||!email ||!password ||!password2) {
-        errors.push({message: "Please fill all fields"});
-    }
-
-    if (password.length < 6) {
-        errors.push({message: "Your password must be longer than 6 characters"});
-    }
-
-    if (password != password2) {
-        errors.push({message: "Passwords do not match"});
-    }
 
 
 async function sqlSelectOrganizations() {
