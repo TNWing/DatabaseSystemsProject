@@ -8,6 +8,7 @@ function Navbar() {
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [loginError, setLoginError] = useState("");
 
   const toggleLoginForm = () => {
     setShowLoginForm(!showLoginForm);
@@ -15,6 +16,7 @@ function Navbar() {
     setPassword("");
     setUsernameError("");
     setPasswordError("");
+    setLoginError("");
   };
   const PORT = 5273;
   const handleSubmit = async (e) => {
@@ -28,32 +30,37 @@ function Navbar() {
     }
 
     // Validate password
-    // if (!password.trim()) {
-    //   setPasswordError("Please enter your password");
-    // } else {
-    //   setPasswordError("");
-    // }
-
+    if (!password.trim()) {
+      setPasswordError("Please enter your password");
+    } else {
+      setPasswordError("");
+    }
+    console.log(JSON.stringify({ username, password }))
     try {
-      const response = await fetch(`http://${window.location.hostname}:${PORT}/checkUsername/${username}`);
+      const response = await fetch(`http://${window.location.hostname}:${PORT}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
       if (!response.ok) {
-        throw new Error('Failed to check username');
+        throw new Error('Failed to sign in');
       }
       const data = await response.json();
-      if (data.exists) {
-        // Username exists
-        console.log('Username exists');
+      if (data.success) { // Check if login is successful
         // Redirect to userDashboard
         window.location.href = '/userDashboard';
+        console.log('User signed in');
       } else {
-        // Username does not exist
-        console.log('Username does not exist');
-        // Proceed with login or display appropriate message
+        // Handle incorrect credentials or other login failures
+        setLoginError('Incorrect username or password');
       }
     } catch (error) {
-      console.error('Error checking username:', error.message);
-      // Handle error - display an error message to the user
+      console.error('Error signing in:', error.message);
+      // Handle error - display an error message to the user or handle as needed
     }
+    
   };
 
   return (
@@ -98,7 +105,7 @@ function Navbar() {
               />
               {usernameError && <div className="error-message">{usernameError}</div>}
             </div>
-            {/* <div className="form-group">
+            <div className="form-group">
               <input
                 type="password"
                 placeholder="Password"
@@ -106,7 +113,8 @@ function Navbar() {
                 onChange={(e) => setPassword(e.target.value)}
               />
               {passwordError && <div className="error-message">{passwordError}</div>}
-            </div> */}
+            </div>
+            {loginError && <div className="error-message">{loginError}</div>}
             <button type="submit">Sign In</button>
             <div>
               <span style={{ color: 'white' }}>Not a member? </span>

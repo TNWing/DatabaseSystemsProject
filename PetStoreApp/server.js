@@ -2,20 +2,24 @@ import './dbConfig.js'
 import './databasepg.js'
 import { pool } from './dbConfig.js'
 import express from 'express';
+import session from 'express-session';
 import cors from 'cors'
 
 const app = express();
-import bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
 const PORT = 5273;
 app.set("view engine", "ejs")
 app.set('port',PORT)
 app.use(cors());
-app.use(express.urlencoded({ extended: false }))
-app.use(express.text())
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.text());
 app.use((req, res, next) => {
-    res.header('Content-Type', 'text/plain');
+    res.header('Content-Type', 'application/json');
+    // res.header('Content-Type', 'text/plain');
     next();
 });
+
 async function sqlSelect(query){
         return new Promise((resolve, reject) => {
             pool.query(query, (err, result) => {
@@ -93,6 +97,8 @@ app.post('/select', async (req, res) => {
   console.log(values);
   res.send(values);
 });
+
+
 /*
     req.session.user={
         username:userDetails.Username
@@ -103,6 +109,7 @@ app.post('/modify', async (req, res) => {//can just use this for insert,update,d
   const data=await sqlModify(req.body);
   res.send(data);
 });
+
 app.get('/', (req, res) => {
     res.render('index')
 });
@@ -133,17 +140,24 @@ app.post('/register', async (req, res) => {
     console.log(registerData);
 
     // Extract user registration data from the parsed JSON object
-    const { userID, email, fname, lname, phonenumber, address } = registerData;
-    const values = [userID, email, fname, lname, phonenumber, address];
-    console.log(values);
-
-    // Perform any necessary data validation here
+    const { userID, password, email, fname, lname, phonenumber, address } = registerData;
+    
+    // Check if the email is already registered
+    const emailCheckQuery = `
+      SELECT * FROM users WHERE email = $1
+    `;
+    const emailCheckResult = await pool.query(emailCheckQuery, [email]);
+    if (emailCheckResult.rows.length > 0) {
+      // Email already exists in the database
+      return res.status(400).json({ success: false, message: 'Email already registered' });
+    }
 
     // Insert the user data into the database
     const query = `
-      INSERT INTO users (userID, email, fname, lname, phonenumber, address)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO users (userID, password, email, fname, lname, phonenumber, address)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
+    const values = [userID, password, email, fname, lname, phonenumber, address];
     await pool.query(query, values);
 
     // Send success response
@@ -155,32 +169,76 @@ app.post('/register', async (req, res) => {
   }
 });
 
-async function checkIfUsernameExists(username) {
-  try {
-    // Query the database to check if the username exists
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [username]);
-    // If a row with the given username exists, return true; otherwise, return false
-    return result.rows.length > 0;
-  } catch (error) {
-    // Log any errors that occur during the database query
-    console.error('Error checking if username exists:', error);
-    // Return false in case of an error or if the query fails
-    return false;
-  }
-}
 
-app.get('/checkUsername/:username', async (req, res) => {
+app.use(session({
+  secret: 'Oo6iCFWGj7Ip3GAjphCa2FFkm',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false }
+}));
+
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+// Logging Middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toLocaleString()}] ${req.method} ${req.url}`);
+  if (req.method === 'POST' || req.method === 'PUT') {
+    console.log('Request Body:', req.body);
+  }
+  next();
+});
+
+// middleware function to check if the user is logged in, if not --> login
+const redirectLogin = (req, res, next) => {
+  // Check if user is logged in 
+  console.log(req.session.user)
+  if (!req.session.user) {
+    res.redirect('/')
+  } else {
+    next();
+  }
+};
+
+const checkAuth = (req, res, next) => {
+  // Check if user is logged in 
+  console.log(req.session.user)
+  if (req.session.user) {
+    res.redirect('/login')
+  } else {
+    next();
+  }
+};
+
+// Apply checkAuth middleware to routes that require authentication
+app.get('/userDashboard/:userid', redirectLogin, (req, res, next) => {
+  // Route handler logic goes here
+  res.render('userDashboard', { username: req.user.username });
+  console.log(username)
+});
+
+
+// Route for checking user credentials
+app.post('/login', checkAuth, async (req, res, next) => {
   try {
-    const username = req.params.username;
-    // Query the database to check if the username exists
-    const userExists = await checkIfUsernameExists(username);
-    // Send JSON response based on whether the username exists or not
-    res.json({ exists: userExists });
+    const { username, password } = req.body;
+    const result = await pool.query('SELECT * FROM Users WHERE Email = $1 AND password = $2', [username, password]);
+    const userExists = result.rows.length > 0;
+
+    if (userExists) {
+      req.session.user = { username };
+      console.log(req.session.user);
+      res.json({ success: true, message: 'User signed in successfully' });
+    } else {
+      res.status(401).json({ success: false, message: 'Invalid username or password' });
+    }
   } catch (error) {
-    console.error('Error checking username:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error); // Pass the error to the error handling middleware
   }
 });
+
 
 app.get('/resources', async (req, res) => {
   try {
@@ -221,7 +279,7 @@ app.delete('/resources/:id', async (req, res) => {
   }
 });
 
-app.put('/empDashboard/:id', async (req, res) => {
+app.put('/empDashboard/:id', redirectLogin, async (req, res) => {
   const resourceId = req.params.id;
   const { url } = req.body;
   console.log(resourceId)
@@ -240,6 +298,24 @@ app.put('/empDashboard/:id', async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to update resource URL' });
   }
 });
+
+app.post('/logout', redirectLogin, async (req, res) => {
+  try {
+    // Clear the user's session
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Error destroying session:', err);
+        return res.status(500).json({ success: false, message: 'Logout failed' });
+      }
+      console.log('User logged out successfully');
+      res.status(200).json({ success: true, message: 'Logout successful' });
+    });
+  } catch (error) {
+    console.error('Error logging out user:', error);
+    res.status(500).json({ success: false, message: 'Logout failed' });
+  }
+});
+
 
 app.post('/resources/insert', async (req, res) => {
   const { resourceNum, url } = req.body;
@@ -276,29 +352,6 @@ app.post('/users/register', async (req, res) => {
         errors.push({message: "Passwords do not match"});
     }
 
-    if(errors.length > 0) {
-        res.render("register", {errors})
-    } else {
-        // Form validation passed
-        let hashedPassword = await bcrypt.hash(password, 10);
-        console.log(hashedPassword);
-
-        // pool.query(
-        //     `SELECT * FROM users WHERE email = $1`,
-        //     [email],
-        //     (err, results) => {
-        //         if (err) {
-        //             throw err;
-        //         }
-        //         console.log(results.rows);
-        //         if (results.rows.length > 0){
-        //             errors.push({ message: "Email already registered"});
-        //             res.render('register', { errors })
-        //         }
-        //     }
-        // )
-    }
-})
 
 async function sqlSelectOrganizations() {
   return new Promise((resolve, reject) => {
@@ -323,62 +376,24 @@ app.get('/organizations', async (req, res) => {
   }
 });
 
-
-// Define endpoint to handle donation form submission
-app.post('/donate', async (req, res) => {
-  // Extract data from the request body
-  const { organization, amount, userid } = req.body;
-console.log("TEST");
-  try {
-      // Fetch the orgid based on the selected organization name
-      const orgResult = await pool.query(
-          `SELECT orgid FROM organizations WHERE name = $1`,
-          [organization]
-      );
-
-      // Check if organization exists
-      if (orgResult.rows.length === 0) {
-          return res.status(404).json({ error: 'Organization not found' });
-      }
-
-      const orgid = orgResult.rows[0].id;
-
-      // Log the data before inserting into the database
-      console.log('Data to be inserted into donations table:', { userid, orgid, amount });
-
-      // Perform SQL insert operation to add donation information to the database
-      const result = await pool.query(
-          `INSERT INTO donations (userid, orgid, amount) VALUES ($1, $2, $3)`,
-          [userid, orgid, amount]
-      );
-
-      // Log the inserted data
-      console.log('Donation submitted:', { userid, orgid, amount });
-
-      // Respond with success message
-      res.status(200).json({ message: 'Donation submitted successfully' });
-  } catch (error) {
-      // Handle errors
-      console.error('Error submitting donation:', error);
-      res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-
 app.get('/pets', async (req, res) => {
   try {
-    const result = await pool.query('SELECT pname FROM pets');
-    const petNames = result.rows.map(row => row.pname);
-    res.json({ petNames });
+    const result = await pool.query(`
+      SELECT p.pname, pi.imageURL
+      FROM pets p 
+      JOIN petImage_Belongs pi ON p.petid = pi.petid
+    `);
+    const petsData = result.rows;
+    res.json({ petsData });
   } catch (error) {
-    console.error('Error fetching pets', error);
+    console.error('Error fetching pets with images', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 // Define endpoint to fetch the user's pet name with hardcoded user ID
 app.get('/adopt/:userid', async (req, res) => {
-  const userid = 'user001'; // Hardcoded user ID
+  // Hardcoded user ID
 
   try {
       // Execute the SQL query to fetch the user's pet name
@@ -410,7 +425,7 @@ app.get('/users/:userid', async (req, res) => {
   const { userid } = req.params;
 
   try {
-    const result = await pool.query('SELECT fname, lname FROM users WHERE userid = $1', [userid]);
+    const result = await pool.query('SELECT fname, lname FROM users WHERE email = $1', [userid]);
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -444,43 +459,59 @@ app.get('/donations/:userid', async (req, res) => {
 });
 
 
-
-// Define endpoint to handle donation form submission
+// Submit donation endpoint
 app.post('/donate', async (req, res) => {
-  // Extract data from the request body
-  const { organization, amount, userid } = req.body;
+  try {
+    // Extract the required fields from the request body
+    const { userid, org_id, amount } = req.body;
+
+    // Validate that all required fields are present and have valid values
+    if (!userid || !org_id || !amount || isNaN(parseFloat(amount))) {
+      console.error('Invalid or missing fields in request body');
+      return res.status(400).json({ error: 'Bad Request: Invalid or missing fields' });
+    }
+
+    // Assuming 'amount' is a numeric field in your database, convert it to a number
+    const donationAmount = parseFloat(amount);
+
+    // Insert the donation record into the database
+    const insertQuery = `
+      INSERT INTO donate (userid, org_id, amount)
+      VALUES ($1, $2, $3)
+    `;
+    await pool.query(insertQuery, [userid, org_id, donationAmount]);
+
+    // Send success response
+    res.status(200).json({ success: true, message: 'Donation submitted successfully' });
+  } catch (error) {
+    console.error('Error submitting donation:', error);
+    res.status(500).json({ success: false, message: 'Failed to submit donation' });
+  }
+});
+
+
+
+
+
+
+
+app.get('/organizations/:name', async (req, res) => {
+  const orgName = req.params.name;
 
   try {
-    // Fetch the orgid based on the selected organization name
-    const orgResult = await pool.query(
-      `SELECT org_id FROM organization WHERE name = $1`,
-      [organization]
-    );
+    // Query the database to fetch the organization ID based on its name
+    const result = await pool.query('SELECT org_id FROM organization WHERE name = $1', [orgName]);
 
-    // Check if organization exists
-    if (orgResult.rows.length === 0) {
+    if (result.rows.length === 0) {
+      // If no organization is found with the given name, return a 404 status code
       return res.status(404).json({ error: 'Organization not found' });
     }
 
-    const orgid = orgResult.rows[0].id;
-
-    // Log the data before inserting into the database
-    console.log('Data to be inserted into donate table:', { userid, orgid, amount });
-
-    // Perform SQL insert operation to add donation information to the database
-    const result = await pool.query(
-      `INSERT INTO donate (userid, org_id, amount) VALUES ($1, $2, $3)`,
-      [userid, orgid, amount]
-    );
-
-    // Log the inserted data
-    console.log('Donation submitted:', { userid, orgid, amount });
-
-    // Respond with success message
-    res.status(200).json({ message: 'Donation submitted successfully' });
+    // Extract the org_id from the query result and send it in the response
+    const orgId = result.rows[0].org_id;
+    res.json({ org_id: orgId });
   } catch (error) {
-    // Handle errors
-    console.error('Error submitting donation:', error);
+    console.error('Error fetching organization details by name:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
