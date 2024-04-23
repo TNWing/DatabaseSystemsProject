@@ -3,8 +3,7 @@ import './databasepg.js'
 import { pool } from './dbConfig.js'
 import express from 'express';
 import session from 'express-session';
-import cors from 'cors'
-import session from 'express-session';
+import cors from 'cors';
 const app = express();
 // import bcrypt from 'bcrypt';
 const PORT = 5273;
@@ -93,6 +92,8 @@ app.post('/modify', async (req, res) => {//can just use this for insert,update,d
   res.send(data);
 });
 app.get('/get-user', function(req, res){
+    console.log("IS USER LG");
+    console.log(req.session.user);
    if(req.session.user){
       res.send({ user: req.session.user });
    } else {
@@ -109,18 +110,6 @@ the server can use req.session.user to get the user session id (this can be anyt
 and we can wrap actions only for logged in users in:
 if (req.session.user){};
 */
-app.post('/login', async (req, res) => {
-  let userDetails=JSON.parse(req.body);
-  let result=0;//TODO: check and verify user
-  if (result){
-    req.session.user={
-        userID:"TODO",
-    }
-  }
-  else{
-    res.send(403,"Invalid Login!");
-  }
-});
 app.post('/register', async (req, res) => {
   try {
     // Parse the JSON data from the request body
@@ -217,6 +206,7 @@ app.post('/login', checkAuth, async (req, res, next) => {
 
     if (userExists) {
       req.session.user = { username };
+      console.log("LOG SESS");
       console.log(req.session.user);
       res.json({ success: true, message: 'User signed in successfully' });
     } else {
@@ -324,7 +314,7 @@ app.post('/users/register', async (req, res) => {
     let { name, email, password, password2 } = req.body;
     console.log({
         name, email, password, password2
-    })
+    });
 
     let errors = [];
 
@@ -338,7 +328,7 @@ app.post('/users/register', async (req, res) => {
 
     if (password != password2) {
         errors.push({message: "Passwords do not match"});
-    }
+    }});
 
 
 async function sqlSelectOrganizations() {
@@ -516,13 +506,6 @@ app.post('/donate', async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to submit donation' });
   }
 });
-
-
-
-
-
-
-
 app.get('/organizations/:name', async (req, res) => {
   const orgName = req.params.name;
 

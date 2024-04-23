@@ -18,8 +18,13 @@ const [breedMap,setBreedMap]=useState(new Map());
 const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch('/get-user')
+   var url="http://"+ window.location.hostname + ":"+PORT +'/get-user';
+   console.log("GETTNG USER");
+    fetch(url, {
+                   method:"GET",
+               })
       .then(response => response.json())
+      .then(data=>console.log(data))
       .then(data => setUser(data.user));
   }, []);
  const [petElements, setPetElements] = useState(null);
@@ -119,7 +124,7 @@ async function processResults(results){
                 return (
                     <div key={index}>{result[1]}
                         <img></img>
-                        <button disabled={user? true:false} onClick={()=>adoptAttempt()}>Adopt!</button>
+                        <button disabled={user? false:true} onClick={()=>adoptAttempt()}>Adopt!</button>
                         <br />
                     </div>
 
